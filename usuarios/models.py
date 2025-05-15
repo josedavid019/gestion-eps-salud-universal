@@ -2,7 +2,7 @@ from django.db import models
 
 class Role(models.Model):
     role_id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=100)
 
     def __str__(self):
