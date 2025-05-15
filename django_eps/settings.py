@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'usuarios',
-    'pacientes'
+    'pacientes',
+    'doctores',
 ]
 
 MIDDLEWARE = [
