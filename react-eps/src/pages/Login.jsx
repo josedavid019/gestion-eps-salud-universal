@@ -7,15 +7,33 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = e => {
+  function handleSubmit(e) {
     e.preventDefault();
-    if (id && password) navigate('/home');
-    else alert('Por favor ingrese credenciales válidas');
-  };
+
+    // Si entra como doctor
+    if (id === 'doc' && password === 'doc') {
+      localStorage.setItem('role', 'doctor');
+      navigate('/home');
+      return;
+    }
+
+    // Para cualquier otro usuario (podrías en el futuro validar contra tu API)
+    if (id && password) {
+      localStorage.setItem('role', 'patient');
+      navigate('/home');
+      return;
+    }
+
+    alert('Por favor ingrese credenciales válidas');
+  }
 
   return (
     <div className="d-flex vh-100 align-items-center justify-content-center bg-light">
-      <form className="p-4 bg-white rounded shadow-sm" style={{ width: '320px' }} onSubmit={handleSubmit}>
+      <form
+        className="p-4 bg-white rounded shadow-sm"
+        style={{ width: '320px' }}
+        onSubmit={handleSubmit}
+      >
         <h2 className="mb-4 text-center">Inicio de Sesión</h2>
         <div className="mb-3">
           <label className="form-label">Identificación</label>
