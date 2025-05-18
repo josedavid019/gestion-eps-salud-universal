@@ -1,4 +1,3 @@
-// src/components/Layout.jsx
 import React from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
@@ -11,12 +10,11 @@ export default function Layout() {
     navigate('/');
   };
 
-  // Ruta base según rol
-  const homePath = role === 'admin'
-    ? '/admin'
-    : role === 'doctor'
-      ? '/doctor-home'
-      : '/home';
+  // Ruta base según rol (validación incluida)
+  let homePath = '/';
+  if (role === 'admin') homePath = '/admin';
+  else if (role === 'doctor') homePath = '/doctor-home';
+  else if (role === 'patient') homePath = '/home';
 
   return (
     <>
@@ -97,6 +95,13 @@ export default function Layout() {
                   </li>
                 </>
               )}
+
+              {/* Enlace común para el perfil */}
+              <li className="nav-item">
+                <Link className="nav-link text-white" to={`${homePath}/profile`}>
+                  Perfil
+                </Link>
+              </li>
 
               <li className="nav-item">
                 <button className="nav-link btn btn-link text-white" onClick={handleLogout}>
