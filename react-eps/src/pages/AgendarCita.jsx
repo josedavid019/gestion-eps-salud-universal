@@ -1,105 +1,173 @@
-// src/pages/AgendarCita.jsx
+// src/pages/DoctorHome.jsx
 import React, { useState, useEffect } from 'react';
-import { format, parseISO, isWithinInterval, setHours } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
-export default function AgendarCita() {
-  const [unidades, setUnidades] = useState([]);
-  const [doctores, setDoctores] = useState([]);
-  const [appointments, setAppointments] = useState([]); // Simulación de citas existentes
-
-  const [form, setForm] = useState({ unidad: '', medico: '', fecha: '', hora: '' });
-  const [error, setError] = useState('');
+export default function DoctorHome() {
+  const navigate = useNavigate();
+  const [appointments, setAppointments] = useState([]);
+  const [filterTime, setFilterTime] = useState('all');
+  const [showModal, setShowModal] = useState(false);
+  const [currentAppt, setCurrentAppt] = useState(null);
+  const [formConsulta, setFormConsulta] = useState({ sintoma: '', tratamiento: '' });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Datos simulados
-    setUnidades([
-      { id: 'U1', nombre: 'Pediatría' },
-      { id: 'U2', nombre: 'General' }
-    ]);
-    setDoctores([
-      { id: 'D1', nombre: 'Dr. Pérez', jornada: 'Matinal' },
-      { id: 'D2', nombre: 'Dra. Gómez', jornada: 'Vespertina' }
-    ]);
-    // citas simuladas
+    // TODO: fetch citas del día
     setAppointments([
-      { medico: 'D1', datetime: '2025-05-18T09:00' },
-      // ... hasta 10 por día
+      { id: 1, paciente: 'Carlos López', datetime: '2025-05-18T09:00', status: 'pending' },
+      { id: 2, paciente: 'Ana Torres',  datetime: '2025-05-18T11:00', status: 'attended' },
+      { id: 3, paciente: 'Luisa Martínez', datetime: '2025-05-18T14:30', status: 'pending' },
     ]);
   }, []);
 
-  const handleChange = e => {
+  const attendedCount = appointments.filter(a => a.status === 'attended').length;
+  const pendingCount = appointments.filter(a => a.status === 'pending').length;
+
+  const handleMark = apptId => {
+    setAppointments(prev => prev.map(a =>
+      a.id === apptId ? { ...a, status: a.status === 'pending' ? 'attended' : 'pending' } : a
+    ));
+  };
+
+  const handleFilter = e => setFilterTime(e.target.value);
+
+  const filtered = appointments.filter(a => {
+    if (filterTime === 'all') return true;
+    const hour = parseISO(a.datetime).getHours();
+    return filterTime === 'morning' ? hour < 12 : hour >= 12;
+  });
+
+  const openRegister = appt => {
+    setCurrentAppt(appt);
+    setFormConsulta({ sintoma: '', tratamiento: '' });
+    setErrors({});
+    setShowModal(true);
+  };
+
+  const closeRegister = () => {
+    setShowModal(false);
+    setCurrentAppt(null);
+  };
+
+  const handleConsultaChange = e => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    setError('');
+    setFormConsulta(prev => ({ ...prev, [name]: value }));
   };
 
-  const validate = () => {
-    const { medico, fecha, hora } = form;
-    if (!medico || !fecha || !hora) {
-      setError('Seleccione doctor, fecha y hora');
-      return false;
+  const validateConsulta = () => {
+    const errs = {};
+    if (formConsulta.sintoma.length < 5 || formConsulta.sintoma.length > 500) {
+      errs.sintoma = 'Debe tener entre 5 y 500 caracteres';
     }
-    const doctor = doctores.find(d => d.id === medico);
-    const selected = parseISO(`${fecha}T${hora}`);
-    // Jornada definida en horas
-    const morning = { start: setHours(selected, 8), end: setHours(selected, 12) };
-    const evening = { start: setHours(selected, 14), end: setHours(selected, 18) };
-    const interval = doctor.jornada === 'Matinal' ? morning : evening;
-    if (!isWithinInterval(selected, interval)) {
-      setError(`Fuera del horario de jornada ${doctor.jornada}`);
-      return false;
+    if (formConsulta.tratamiento.length < 5 || formConsulta.tratamiento.length > 500) {
+      errs.tratamiento = 'Debe tener entre 5 y 500 caracteres';
     }
-    // contar citas del médico ese día
-    const count = appointments.filter(a =>
-      a.medico === medico && format(parseISO(a.datetime), 'yyyy-MM-dd') === fecha
-    ).length;
-    if (count >= 10) {
-      setError('El doctor ya tiene 10 citas en esa fecha');
-      return false;
-    }
-    return true;
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    if (!validate()) return;
-    const datetime = `${form.fecha}T${form.hora}`;
-    setAppointments(prev => [...prev, { medico: form.medico, datetime }]);
-    alert('Cita agendada correctamente');
-    setForm({ unidad: '', medico: '', fecha: '', hora: '' });
+  const handleSaveConsulta = () => {
+    if (!validateConsulta()) return;
+    // TODO: enviar al backend con citaId = currentAppt.id
+    // Simulación: marcar como atendida
+    handleMark(currentAppt.id);
+    closeRegister();
+    // Toast de confirmación
+    alert('Consulta registrada correctamente');
+    // Redirigir a agenda
+    navigate('/doctor-home');
   };
 
   return (
     <div className="container my-4">
-      <h2 className="mb-4">Agendar Cita</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleSubmit} className="row g-3">
-        <div className="col-md-4">
-          <label className="form-label">Unidad</label>
-          <select name="unidad" value={form.unidad} onChange={handleChange} className="form-select" required>
-            <option value="">Seleccione...</option>
-            {unidades.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
+      <h2 className="mb-4">Agenda del Día</h2>
+      <div className="mb-3 d-flex align-items-center justify-content-between">
+        <div>
+          <span className="badge bg-success me-2">Atendidas: {attendedCount}</span>
+          <span className="badge bg-warning text-dark">Pendientes: {pendingCount}</span>
+        </div>
+        <div>
+          <label className="me-2">Filtrar por horario:</label>
+          <select value={filterTime} onChange={handleFilter} className="form-select d-inline-block w-auto">
+            <option value="all">Todas</option>
+            <option value="morning">Matutino</option>
+            <option value="afternoon">Vespertino</option>
           </select>
         </div>
-        <div className="col-md-4">
-          <label className="form-label">Doctor</label>
-          <select name="medico" value={form.medico} onChange={handleChange} className="form-select" required>
-            <option value="">Seleccione...</option>
-            {doctores.map(d => <option key={d.id} value={d.id}>{d.nombre} ({d.jornada})</option>)}
-          </select>
+      </div>
+      <div className="table-responsive">
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th>Hora</th><th>Paciente</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(a => (
+              <tr key={a.id} className={a.status === 'attended' ? 'table-success' : ''}>
+                <td>{format(parseISO(a.datetime), 'HH:mm')}</td>
+                <td>{a.paciente}</td>
+                <td>{a.status === 'pending' ? 'Pendiente' : 'Atendida'}</td>
+                <td>
+                  <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleMark(a.id)}>
+                    {a.status === 'pending' ? 'Marcar Atendida' : 'Revertir'}
+                  </button>
+                  <button className="btn btn-sm btn-outline-secondary" onClick={() => openRegister(a)}>
+                    Registrar Consulta
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showModal && currentAppt && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Registrar Consulta - {currentAppt.paciente}</h5>
+                <button type="button" className="btn-close" onClick={closeRegister}></button>
+              </div>
+              <div className="modal-body">
+                <input type="hidden" name="citaId" value={currentAppt.id} />
+                <div className="mb-3">
+                  <label className="form-label">Síntoma</label>
+                  <textarea
+                    className="form-control"
+                    name="sintoma"
+                    value={formConsulta.sintoma}
+                    onChange={handleConsultaChange}
+                    required
+                    minLength={5}
+                    maxLength={500}
+                  />
+                  {errors.sintoma && <div className="text-danger">{errors.sintoma}</div>}
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Tratamiento</label>
+                  <textarea
+                    className="form-control"
+                    name="tratamiento"
+                    value={formConsulta.tratamiento}
+                    onChange={handleConsultaChange}
+                    required
+                    minLength={5}
+                    maxLength={500}
+                  />
+                  {errors.tratamiento && <div className="text-danger">{errors.tratamiento}</div>}
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={closeRegister}>Cancelar</button>
+                <button className="btn btn-primary" onClick={handleSaveConsulta}>Guardar Consulta</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="col-md-4">
-          <label className="form-label">Fecha</label>
-          <input type="date" name="fecha" value={form.fecha} onChange={handleChange} className="form-control" required />
-        </div>
-        <div className="col-md-4">
-          <label className="form-label">Hora</label>
-          <input type="time" name="hora" value={form.hora} onChange={handleChange} className="form-control" required />
-        </div>
-        <div className="col-12">
-          <button type="submit" className="btn btn-primary">Agendar</button>
-        </div>
-      </form>
+      )}
     </div>
   );
 }
