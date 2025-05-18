@@ -39,19 +39,19 @@ export default function Layout() {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               {role === 'patient' && (
-                <>  
+                <>
                   <li className="nav-item">
-                    <Link className="nav-link text-white" to="/agendar">
+                    <Link className="nav-link text-white" to="/home/agendar">
                       Agendar Cita
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link text-white" to="/mis-citas">
+                    <Link className="nav-link text-white" to="/home/mis-citas">
                       Mis Citas
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link text-white" to="/historial">
+                    <Link className="nav-link text-white" to="/home/historial">
                       Historial Clínico
                     </Link>
                   </li>
@@ -59,19 +59,19 @@ export default function Layout() {
               )}
 
               {role === 'doctor' && (
-                <>                  
+                <>
                   <li className="nav-item">
                     <Link className="nav-link text-white" to="/doctor-home">
                       Agenda del Día
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link text-white" to="/registrar-consulta">
+                    <Link className="nav-link text-white" to="/doctor-home/registrar-consulta">
                       Registrar Consulta
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link className="nav-link text-white" to="/buscar-paciente">
+                    <Link className="nav-link text-white" to="/doctor-home/buscar-paciente">
                       Buscar Paciente
                     </Link>
                   </li>
@@ -79,7 +79,7 @@ export default function Layout() {
               )}
 
               {role === 'admin' && (
-                <>                  
+                <>
                   <li className="nav-item">
                     <Link className="nav-link text-white" to="/admin/pacientes">
                       Gestionar Pacientes
@@ -107,6 +107,7 @@ export default function Layout() {
           </div>
         </div>
       </nav>
+
       <main className="container py-4">
         <Outlet />
       </main>
