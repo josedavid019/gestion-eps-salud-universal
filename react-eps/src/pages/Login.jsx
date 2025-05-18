@@ -10,14 +10,21 @@ export default function Login() {
   function handleSubmit(e) {
     e.preventDefault();
 
-    // Si entra como doctor
+    // Administrador
+    if (id === 'admin' && password === 'admin') {
+      localStorage.setItem('role', 'admin');
+      navigate('/admin');
+      return;
+    }
+
+    // Doctor
     if (id === 'doc' && password === 'doc') {
       localStorage.setItem('role', 'doctor');
       navigate('/home');
       return;
     }
 
-    // Para cualquier otro usuario (podrías en el futuro validar contra tu API)
+    // Paciente (cualquier otra credencial válida)
     if (id && password) {
       localStorage.setItem('role', 'patient');
       navigate('/home');

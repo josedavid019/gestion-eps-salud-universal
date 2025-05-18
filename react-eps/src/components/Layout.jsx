@@ -11,11 +11,18 @@ export default function Layout() {
     navigate('/');
   };
 
+  // Ruta base según rol
+  const homePath = role === 'admin'
+    ? '/admin'
+    : role === 'doctor'
+      ? '/doctor-home'
+      : '/home';
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
-          <Link className="navbar-brand text-white" to={role === 'doctor' ? '/home' : '/'}>
+          <Link className="navbar-brand text-white" to={homePath}>
             EPS Salud Universal
           </Link>
           <button
@@ -31,26 +38,8 @@ export default function Layout() {
           </button>
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
-              {role === 'doctor' ? (
-                <>                  
-                  <li className="nav-item">
-                    <Link className="nav-link text-white" to="/home">
-                      Agenda del Día
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link text-white" to="/registrar-consulta">
-                      Registrar Consulta
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link text-white" to="/buscar-paciente">
-                      Buscar Paciente
-                    </Link>
-                  </li>
-                </>
-              ) : (
-                <>
+              {role === 'patient' && (
+                <>  
                   <li className="nav-item">
                     <Link className="nav-link text-white" to="/agendar">
                       Agendar Cita
@@ -68,6 +57,47 @@ export default function Layout() {
                   </li>
                 </>
               )}
+
+              {role === 'doctor' && (
+                <>                  
+                  <li className="nav-item">
+                    <Link className="nav-link text-white" to="/doctor-home">
+                      Agenda del Día
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link text-white" to="/registrar-consulta">
+                      Registrar Consulta
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link text-white" to="/buscar-paciente">
+                      Buscar Paciente
+                    </Link>
+                  </li>
+                </>
+              )}
+
+              {role === 'admin' && (
+                <>                  
+                  <li className="nav-item">
+                    <Link className="nav-link text-white" to="/admin/pacientes">
+                      Gestionar Pacientes
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link text-white" to="/admin/doctores">
+                      Gestionar Doctores
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link text-white" to="/admin/unidades">
+                      Gestionar Unidades
+                    </Link>
+                  </li>
+                </>
+              )}
+
               <li className="nav-item">
                 <button className="nav-link btn btn-link text-white" onClick={handleLogout}>
                   Cerrar Sesión
