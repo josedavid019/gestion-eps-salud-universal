@@ -1,4 +1,3 @@
-// src/pages/GestionarDoctores.jsx
 import React, { useState, useEffect } from 'react';
 
 export default function GestionarDoctores() {
@@ -10,7 +9,6 @@ export default function GestionarDoctores() {
   });
 
   useEffect(() => {
-    // TODO: fetch('/api/doctores')
     setDoctores([
       { id: 'D1', nombre: 'Juan', apellido: 'Pérez', direccion: 'Calle 100', telefono: '3001234567', especialidad: 'Pediatría', jornada: 'Matinal' },
       { id: 'D2', nombre: 'María', apellido: 'Gómez', direccion: 'Av. 50', telefono: '3007654321', especialidad: 'Dermatología', jornada: 'Vespertina' }
@@ -37,6 +35,11 @@ export default function GestionarDoctores() {
 
   const handleSubmit = e => {
     e.preventDefault();
+    const formElement = e.target;
+    if (!formElement.checkValidity()) {
+      formElement.classList.add('was-validated');
+      return;
+    }
     if (editing) {
       setDoctores(prev => prev.map(d => d.id === editing ? form : d));
     } else {
@@ -97,41 +100,43 @@ export default function GestionarDoctores() {
                 <h5 className="modal-title">{editing ? 'Editar Doctor' : 'Nuevo Doctor'}</h5>
                 <button type="button" className="btn-close" onClick={closeModal}></button>
               </div>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate className="needs-validation">
                 <div className="modal-body">
-                  {[
-                    { name: 'id', label: 'ID', type: 'text' },
-                    { name: 'nombre', label: 'Nombre', type: 'text' },
-                    { name: 'apellido', label: 'Apellido', type: 'text' },
+                  {[{ name: 'id', label: 'ID', type: 'text', pattern: '[A-Za-z0-9]+' },
+                    { name: 'nombre', label: 'Nombre', type: 'text', pattern: '[A-Za-zÁÉÍÓÚáéíóúñÑ ]+' },
+                    { name: 'apellido', label: 'Apellido', type: 'text', pattern: '[A-Za-zÁÉÍÓÚáéíóúñÑ ]+' },
                     { name: 'direccion', label: 'Dirección', type: 'text' },
-                    { name: 'telefono', label: 'Teléfono', type: 'text' },
+                    { name: 'telefono', label: 'Teléfono', type: 'tel', pattern: '[0-9]{10}' },
                     { name: 'especialidad', label: 'Especialidad', type: 'text' },
-                  ].map(f => (
+                    { name: 'jornada', label: 'Jornada', type: 'select', options: ['Matinal', 'Vespertina'] }].map(f => (
                     <div className="mb-3" key={f.name}>
                       <label className="form-label">{f.label}</label>
-                      <input
-                        type={f.type}
-                        className="form-control"
-                        name={f.name}
-                        value={form[f.name]}
-                        onChange={handleChange}
-                        required
-                      />
+                      {f.type === 'select' ? (
+                        <select
+                          className="form-select"
+                          name={f.name}
+                          value={form[f.name]}
+                          onChange={handleChange}
+                          required
+                        >
+                          {f.options.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type={f.type}
+                          className="form-control"
+                          name={f.name}
+                          value={form[f.name]}
+                          onChange={handleChange}
+                          pattern={f.pattern || undefined}
+                          required
+                        />
+                      )}
+                      <div className="invalid-feedback">Por favor ingrese un valor válido.</div>
                     </div>
                   ))}
-                  <div className="mb-3">
-                    <label className="form-label">Jornada</label>
-                    <select
-                      className="form-select"
-                      name="jornada"
-                      value={form.jornada}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="Matinal">Matinal</option>
-                      <option value="Vespertina">Vespertina</option>
-                    </select>
-                  </div>
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancelar</button>

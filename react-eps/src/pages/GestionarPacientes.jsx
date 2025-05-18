@@ -5,12 +5,14 @@ export default function GestionarPacientes() {
   const [pacientes, setPacientes] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [validated, setValidated] = useState(false);
+
   const [form, setForm] = useState({
     id: '', nombre: '', apellido: '', direccion: '', edad: '', tipoAfiliacion: '', fechaIngreso: ''
   });
 
   useEffect(() => {
-    // TODO: fetch '/api/pacientes'
+    // Simulación de datos iniciales
     setPacientes([
       { id: '1', nombre: 'Juan', apellido: 'Pérez', direccion: 'Calle 123', edad: 30, tipoAfiliacion: 'Contributivo', fechaIngreso: '2025-01-10' },
       { id: '2', nombre: 'María', apellido: 'Gómez', direccion: 'Av. 45', edad: 25, tipoAfiliacion: 'Subsidiado', fechaIngreso: '2025-02-20' }
@@ -18,6 +20,7 @@ export default function GestionarPacientes() {
   }, []);
 
   const openModal = paciente => {
+    setValidated(false);
     if (paciente) {
       setEditing(paciente.id);
       setForm({ ...paciente });
@@ -36,7 +39,14 @@ export default function GestionarPacientes() {
   };
 
   const handleSubmit = e => {
+    const formEl = e.currentTarget;
     e.preventDefault();
+    if (formEl.checkValidity() === false) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
+    setValidated(true);
     if (editing) {
       setPacientes(prev => prev.map(p => p.id === editing ? form : p));
     } else {
@@ -46,7 +56,7 @@ export default function GestionarPacientes() {
   };
 
   const handleDelete = id => {
-    if (window.confirm('¿Eliminar paciente?')) {
+    if (window.confirm('¿Estás seguro de eliminar este paciente?')) {
       setPacientes(prev => prev.filter(p => p.id !== id));
     }
   };
@@ -59,7 +69,8 @@ export default function GestionarPacientes() {
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>ID</th><th>Nombre</th><th>Apellido</th><th>Dirección</th><th>Edad</th><th>Tipo</th><th>Ingreso</th><th>Acciones</th>
+              <th>ID</th><th>Nombre</th><th>Apellido</th><th>Dirección</th>
+              <th>Edad</th><th>Tipo Afiliación</th><th>Fecha Ingreso</th><th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -90,19 +101,34 @@ export default function GestionarPacientes() {
                 <h5 className="modal-title">{editing ? 'Editar Paciente' : 'Nuevo Paciente'}</h5>
                 <button type="button" className="btn-close" onClick={closeModal}></button>
               </div>
-              <form onSubmit={handleSubmit}>
+              <form noValidate className={validated ? 'was-validated' : ''} onSubmit={handleSubmit}>
                 <div className="modal-body">
-                  {['id','nombre','apellido','direccion','edad','tipoAfiliacion','fechaIngreso'].map(f => (
-                    <div className="mb-3" key={f}>
-                      <label className="form-label">{f.charAt(0).toUpperCase()+f.slice(1).replace(/([A-Z])/g,' $1')}</label>
+                  {[ 
+                    { name: 'id', label: 'ID', type: 'text', pattern: '\\d+' },
+                    { name: 'nombre', label: 'Nombre', type: 'text', pattern: '[A-Za-z ]+' },
+                    { name: 'apellido', label: 'Apellido', type: 'text', pattern: '[A-Za-z ]+' },
+                    { name: 'direccion', label: 'Dirección', type: 'text' },
+                    { name: 'edad', label: 'Edad', type: 'number', min: 1, max: 120 },
+                    { name: 'tipoAfiliacion', label: 'Tipo de Afiliación', type: 'text' },
+                    { name: 'fechaIngreso', label: 'Fecha de Ingreso', type: 'date' }
+                  ].map(f => (
+                    <div className="mb-3" key={f.name}>
+                      <label htmlFor={f.name} className="form-label">{f.label}</label>
                       <input
-                        type={f==='fechaIngreso'?'date':'text'}
+                        id={f.name}
+                        type={f.type}
                         className="form-control"
-                        name={f}
-                        value={form[f]}
+                        name={f.name}
+                        value={form[f.name]}
                         onChange={handleChange}
                         required
+                        {...(f.pattern && { pattern: f.pattern })}
+                        {...(f.min && { min: f.min })}
+                        {...(f.max && { max: f.max })}
                       />
+                      <div className="invalid-feedback">
+                        Por favor, ingresa un valor válido en {f.label}.
+                      </div>
                     </div>
                   ))}
                 </div>
