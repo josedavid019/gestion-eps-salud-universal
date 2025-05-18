@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function GestionarPacientes() {
   const [pacientes, setPacientes] = useState([]);
+  const [filter, setFilter] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [validated, setValidated] = useState(false);
@@ -12,7 +13,6 @@ export default function GestionarPacientes() {
   });
 
   useEffect(() => {
-    // Simulación de datos iniciales
     setPacientes([
       { id: '1', nombre: 'Juan', apellido: 'Pérez', direccion: 'Calle 123', edad: 30, tipoAfiliacion: 'Contributivo', fechaIngreso: '2025-01-10' },
       { id: '2', nombre: 'María', apellido: 'Gómez', direccion: 'Av. 45', edad: 25, tipoAfiliacion: 'Subsidiado', fechaIngreso: '2025-02-20' }
@@ -41,7 +41,7 @@ export default function GestionarPacientes() {
   const handleSubmit = e => {
     const formEl = e.currentTarget;
     e.preventDefault();
-    if (formEl.checkValidity() === false) {
+    if (!formEl.checkValidity()) {
       e.stopPropagation();
       setValidated(true);
       return;
@@ -61,10 +61,25 @@ export default function GestionarPacientes() {
     }
   };
 
+  const filtered = pacientes.filter(p =>
+    p.id.includes(filter) ||
+    p.nombre.toLowerCase().includes(filter.toLowerCase()) ||
+    p.apellido.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <div className="container my-4">
       <h2 className="mb-4">Gestionar Pacientes</h2>
-      <button className="btn btn-success mb-3" onClick={() => openModal(null)}>Nuevo Paciente</button>
+      <div className="d-flex mb-3 align-items-center">
+        <button className="btn btn-success me-3" onClick={() => openModal(null)}>Nuevo Paciente</button>
+        <input
+          type="text"
+          className="form-control w-25"
+          placeholder="Filtrar pacientes..."
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+        />
+      </div>
       <div className="table-responsive">
         <table className="table table-striped">
           <thead>
@@ -74,7 +89,7 @@ export default function GestionarPacientes() {
             </tr>
           </thead>
           <tbody>
-            {pacientes.map(p => (
+            {filtered.map(p => (
               <tr key={p.id}>
                 <td>{p.id}</td>
                 <td>{p.nombre}</td>
@@ -103,7 +118,7 @@ export default function GestionarPacientes() {
               </div>
               <form noValidate className={validated ? 'was-validated' : ''} onSubmit={handleSubmit}>
                 <div className="modal-body">
-                  {[ 
+                  {[
                     { name: 'id', label: 'ID', type: 'text', pattern: '\\d+' },
                     { name: 'nombre', label: 'Nombre', type: 'text', pattern: '[A-Za-z ]+' },
                     { name: 'apellido', label: 'Apellido', type: 'text', pattern: '[A-Za-z ]+' },

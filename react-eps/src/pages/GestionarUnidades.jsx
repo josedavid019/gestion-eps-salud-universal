@@ -4,17 +4,18 @@ import React, { useState, useEffect } from 'react';
 export default function GestionarUnidades() {
   const [unidades, setUnidades] = useState([]);
   const [doctores, setDoctores] = useState([]);
+  const [filter, setFilter] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [validated, setValidated] = useState(false);
   const [form, setForm] = useState({ id: '', nombre: '', planta: '', doctorResponsable: '' });
 
   useEffect(() => {
-    // TODO: fetch('/api/unidades')
+    // Datos simulados
     setUnidades([
       { id: 'U1', nombre: 'Pediatría', planta: 1, doctorResponsable: 'D1' },
       { id: 'U2', nombre: 'Fractura', planta: 2, doctorResponsable: 'D2' }
     ]);
-    // TODO: fetch('/api/doctores') para llenar dropdown
     setDoctores([
       { id: 'D1', nombre: 'Juan Pérez' },
       { id: 'D2', nombre: 'María Gómez' }
@@ -22,6 +23,7 @@ export default function GestionarUnidades() {
   }, []);
 
   const openModal = unidad => {
+    setValidated(false);
     if (unidad) {
       setEditing(unidad.id);
       setForm({ ...unidad });
@@ -40,7 +42,13 @@ export default function GestionarUnidades() {
   };
 
   const handleSubmit = e => {
+    const formEl = e.currentTarget;
     e.preventDefault();
+    if (!formEl.checkValidity()) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
     const nuevaUnidad = { ...form, planta: Number(form.planta) };
     if (editing) {
       setUnidades(prev => prev.map(u => u.id === editing ? nuevaUnidad : u));
@@ -56,10 +64,24 @@ export default function GestionarUnidades() {
     }
   };
 
+  const filtered = unidades.filter(u =>
+    u.nombre.toLowerCase().includes(filter.toLowerCase()) ||
+    u.id.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <div className="container my-4">
       <h2 className="mb-4">Gestionar Unidades</h2>
-      <button className="btn btn-success mb-3" onClick={() => openModal(null)}>Nueva Unidad</button>
+      <div className="d-flex mb-3 align-items-center">
+        <button className="btn btn-success me-3" onClick={() => openModal(null)}>Nueva Unidad</button>
+        <input
+          type="text"
+          className="form-control w-25"
+          placeholder="Filtrar unidades..."
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+        />
+      </div>
       <div className="table-responsive">
         <table className="table table-striped">
           <thead>
@@ -72,7 +94,7 @@ export default function GestionarUnidades() {
             </tr>
           </thead>
           <tbody>
-            {unidades.map(u => (
+            {filtered.map(u => (
               <tr key={u.id}>
                 <td>{u.id}</td>
                 <td>{u.nombre}</td>
@@ -96,23 +118,27 @@ export default function GestionarUnidades() {
                 <h5 className="modal-title">{editing ? 'Editar Unidad' : 'Nueva Unidad'}</h5>
                 <button type="button" className="btn-close" onClick={closeModal}></button>
               </div>
-              <form onSubmit={handleSubmit}>
+              <form noValidate className={validated ? 'was-validated' : ''} onSubmit={handleSubmit}>
                 <div className="modal-body">
                   {[
-                    { name: 'id', label: 'ID', type: 'text' },
+                    { name: 'id', label: 'ID', type: 'text', pattern: 'U\\d+' },
                     { name: 'nombre', label: 'Nombre', type: 'text' },
-                    { name: 'planta', label: 'Planta', type: 'number' }
+                    { name: 'planta', label: 'Planta', type: 'number', min: 1 }
                   ].map(f => (
                     <div className="mb-3" key={f.name}>
-                      <label className="form-label">{f.label}</label>
+                      <label htmlFor={f.name} className="form-label">{f.label}</label>
                       <input
+                        id={f.name}
                         type={f.type}
                         className="form-control"
                         name={f.name}
                         value={form[f.name]}
                         onChange={handleChange}
                         required
+                        {...(f.pattern && { pattern: f.pattern })}
+                        {...(f.min && { min: f.min })}
                       />
+                      <div className="invalid-feedback">Por favor ingresa un valor válido en {f.label}.</div>
                     </div>
                   ))}
                   <div className="mb-3">
@@ -129,6 +155,7 @@ export default function GestionarUnidades() {
                         <option key={d.id} value={d.id}>{d.nombre}</option>
                       ))}
                     </select>
+                    <div className="invalid-feedback">Selecciona un doctor responsable.</div>
                   </div>
                 </div>
                 <div className="modal-footer">
