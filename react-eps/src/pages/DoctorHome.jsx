@@ -1,83 +1,120 @@
 // src/pages/DoctorHome.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { format, parseISO } from 'date-fns';
 
 export default function DoctorHome() {
-  const [citasHoy, setCitasHoy] = useState([]);
-  const role = localStorage.getItem('role');
+  const [appointments, setAppointments] = useState([]);
+  const [filterTime, setFilterTime] = useState('all');
+  const [showModal, setShowModal] = useState(false);
+  const [currentAppt, setCurrentAppt] = useState(null);
 
   useEffect(() => {
-    if (role === 'doctor') {
-      // TODO: reemplazar URL con tu endpoint real
-      fetch('/api/citas/today')
-        .then(res => res.json())
-        .then(data => setCitasHoy(data))
-        .catch(err => console.error('Error fetching citas:', err));
-    }
-  }, [role]);
+    // TODO: fetch('/api/appointments/today')
+    setAppointments([
+      { id: 1, paciente: 'Carlos López', datetime: '2025-05-18T09:00', status: 'pending' },
+      { id: 2, paciente: 'Ana Torres',  datetime: '2025-05-18T11:00', status: 'attended' },
+      { id: 3, paciente: 'Luisa Martínez', datetime: '2025-05-18T14:30', status: 'pending' },
+    ]);
+  }, []);
 
-  const handleRegistrarConsulta = citaId => {
-    // TODO: navegar a formulario de registro de consulta
-    console.log('Registrar consulta para cita', citaId);
+  const attendedCount = appointments.filter(a => a.status === 'attended').length;
+  const pendingCount = appointments.filter(a => a.status === 'pending').length;
+
+  const handleMark = apptId => {
+    setAppointments(prev => prev.map(a =>
+      a.id === apptId ? { ...a, status: a.status === 'pending' ? 'attended' : 'pending' } : a
+    ));
   };
 
-  const handleVerDetalle = citaId => {
-    // TODO: navegar a vista de detalle de consulta
-    console.log('Ver detalle de cita', citaId);
+  const handleFilter = (e) => {
+    setFilterTime(e.target.value);
+  };
+
+  const filtered = appointments.filter(a => {
+    if (filterTime === 'all') return true;
+    const hour = parseISO(a.datetime).getHours();
+    if (filterTime === 'morning') return hour < 12;
+    if (filterTime === 'afternoon') return hour >= 12;
+    return true;
+  });
+
+  const openRegister = appt => {
+    setCurrentAppt(appt);
+    setShowModal(true);
+  };
+
+  const closeRegister = () => {
+    setShowModal(false);
+    setCurrentAppt(null);
   };
 
   return (
     <div className="container my-4">
-      <h2 className="mb-4 text-center">Agenda del Día</h2>
-      <div className="card">
-        <div className="table-responsive">
-          <table className="table mb-0">
-            <thead className="table-light">
-              <tr>
-                <th>Hora</th>
-                <th>Paciente</th>
-                <th>Unidad</th>
-                <th>Estado</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {citasHoy.length > 0 ? (
-                citasHoy.map(cita => (
-                  <tr key={cita.id}>
-                    <td>{cita.hora}</td>
-                    <td>{cita.paciente}</td>
-                    <td>{cita.unidad}</td>
-                    <td>{cita.estado}</td>
-                    <td>
-                      {cita.estado === 'Pendiente' ? (
-                        <button
-                          className="btn btn-sm btn-primary"
-                          onClick={() => handleRegistrarConsulta(cita.id)}
-                        >
-                          Registrar consulta
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-sm btn-secondary"
-                          onClick={() => handleVerDetalle(cita.id)}
-                        >
-                          Ver detalle
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="text-center py-3">
-                    No hay citas programadas para hoy.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <h2 className="mb-4">Agenda del Día</h2>
+      <div className="mb-3 d-flex align-items-center justify-content-between">
+        <div>
+          <span className="badge bg-success me-2">Atendidas: {attendedCount}</span>
+          <span className="badge bg-warning text-dark">Pendientes: {pendingCount}</span>
+        </div>
+        <div>
+          <label className="me-2">Filtrar por horario:</label>
+          <select value={filterTime} onChange={handleFilter} className="form-select d-inline-block w-auto">
+            <option value="all">Todas</option>
+            <option value="morning">Matutino</option>
+            <option value="afternoon">Vespertino</option>
+          </select>
         </div>
       </div>
+      <div className="table-responsive">
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Paciente</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(a => (
+              <tr key={a.id} className={a.status === 'attended' ? 'table-success' : ''}>
+                <td>{format(parseISO(a.datetime), 'HH:mm')}</td>
+                <td>{a.paciente}</td>
+                <td>{a.status === 'pending' ? 'Pendiente' : 'Atendida'}</td>
+                <td>
+                  <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleMark(a.id)}>
+                    {a.status === 'pending' ? 'Marcar Atendida' : 'Revertir'}
+                  </button>
+                  <button className="btn btn-sm btn-outline-secondary" onClick={() => openRegister(a)}>
+                    Registrar Consulta
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showModal && currentAppt && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Registrar Consulta - {currentAppt.paciente}</h5>
+                <button type="button" className="btn-close" onClick={closeRegister}></button>
+              </div>
+              <div className="modal-body">
+                {/* Aquí iría el formulario de consulta (síntomas, tratamiento, etc.) */}
+                <p>Formulario de registro de consulta...</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={closeRegister}>Cerrar</button>
+                <button className="btn btn-primary" onClick={closeRegister}>Guardar Consulta</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
