@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import React from 'react';
 import DoctorHome from './DoctorHome';
-import ReactHome from './Home'; // renombra tu Home actual a este alias si hace falta
+import ReactHome from './Home'; 
 
 export default function Home() {
   const role = localStorage.getItem('role');
