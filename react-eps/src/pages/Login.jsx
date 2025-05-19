@@ -1,6 +1,6 @@
 // src/pages/Login.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Login() {
   const [id, setId] = useState('');
@@ -20,11 +20,11 @@ export default function Login() {
     // Doctor
     if (id === 'doc' && password === 'doc') {
       localStorage.setItem('role', 'doctor');
-      navigate('/home');
+      navigate('/doctor-home');
       return;
     }
 
-    // Paciente (cualquier otra credencial válida)
+    // Paciente
     if (id && password) {
       localStorage.setItem('role', 'patient');
       navigate('/home');
@@ -65,6 +65,12 @@ export default function Login() {
           />
         </div>
         <button type="submit" className="btn btn-primary w-100">Entrar</button>
+        <div className="text-center mt-3">
+          <small>
+            ¿No tienes cuenta?{' '}
+            <Link to="/register">Regístrate aquí</Link>
+          </small>
+        </div>
       </form>
     </div>
   );
