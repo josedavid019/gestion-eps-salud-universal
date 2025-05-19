@@ -1,3 +1,4 @@
+// src/components/Layout.jsx
 import React from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
@@ -10,7 +11,7 @@ export default function Layout() {
     navigate('/');
   };
 
-  // Ruta base según rol (validación incluida)
+  // Ruta base según rol
   let homePath = '/';
   if (role === 'admin') homePath = '/admin';
   else if (role === 'doctor') homePath = '/doctor-home';
@@ -19,7 +20,7 @@ export default function Layout() {
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div className="container">
+        <div className="container-fluid px-2">
           <Link className="navbar-brand text-white" to={homePath}>
             EPS Salud Universal
           </Link>
@@ -113,7 +114,7 @@ export default function Layout() {
         </div>
       </nav>
 
-      <main className="container py-4">
+      <main className="container-fluid px-2 py-4">
         <Outlet />
       </main>
     </>
