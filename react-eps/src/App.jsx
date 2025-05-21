@@ -1,29 +1,30 @@
 // src/App.jsx
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
-import Login from './pages/Login';
-import Register from './pages/Register';     // <— import Register
-import Layout from './components/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
+import Login from "./pages/Login";
+import { Registrar } from "./pages/Registrar"; // <— import Register
+import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pacientes
-import Home from './pages/Home';
-import AgendarCita from './pages/AgendarCita';
-import MisCitas from './pages/MisCitas';
-import HistorialClinico from './pages/HistorialClinico';
-import Profile from './pages/Profile';
+import Home from "./pages/Home";
+import AgendarCita from "./pages/AgendarCita";
+import MisCitas from "./pages/MisCitas";
+import HistorialClinico from "./pages/HistorialClinico";
+import Profile from "./pages/Profile";
 
 // Doctores
-import DoctorHome from './pages/DoctorHome';
-import RegistrarConsulta from './pages/RegistrarConsulta';
-import BuscarPaciente from './pages/BuscarPaciente';
+import DoctorHome from "./pages/DoctorHome";
+import RegistrarConsulta from "./pages/RegistrarConsulta";
+import BuscarPaciente from "./pages/BuscarPaciente";
 
 // Administradores
-import AdminHome from './pages/AdminHome';
-import GestionarPacientes from './pages/GestionarPacientes';
-import GestionarDoctores from './pages/GestionarDoctores';
-import GestionarUnidades from './pages/GestionarUnidades';
+import AdminHome from "./pages/AdminHome";
+import GestionarPacientes from "./pages/GestionarPacientes";
+import GestionarDoctores from "./pages/GestionarDoctores";
+import GestionarUnidades from "./pages/GestionarUnidades";
 
 export default function App() {
   return (
@@ -31,8 +32,8 @@ export default function App() {
       <Routes>
         {/* Ruta pública */}
         <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />  {/* Ruta de registro */}
-
+        <Route path="/registrar" element={<Registrar />} />{" "}
+        {/* Ruta de registro */}
         {/* Rutas de paciente (cualquier usuario autenticado) */}
         <Route element={<ProtectedRoute />}>
           <Route path="home" element={<Layout />}>
@@ -43,7 +44,6 @@ export default function App() {
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
-
         {/* Rutas de doctor */}
         <Route element={<ProtectedRoute requiredRole="doctor" />}>
           <Route path="doctor-home" element={<Layout />}>
@@ -53,7 +53,6 @@ export default function App() {
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
-
         {/* Rutas de admin */}
         <Route element={<ProtectedRoute requiredRole="admin" />}>
           <Route path="admin" element={<Layout />}>
@@ -65,6 +64,7 @@ export default function App() {
           </Route>
         </Route>
       </Routes>
+      <Toaster />
     </BrowserRouter>
   );
 }

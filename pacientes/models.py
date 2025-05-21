@@ -13,7 +13,7 @@ class paciente(models.Model):
     identificacion = models.CharField(max_length=100, unique=True)
     direccion = models.CharField(max_length=100)
     edad = models.IntegerField()
-    fecha_ingreso = models.DateTimeField(auto_now_add=True)
+    fecha_ingreso = models.DateField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     usuario = models.ForeignKey('usuarios.Usuario', on_delete=models.CASCADE)

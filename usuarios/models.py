@@ -11,7 +11,7 @@ class Role(models.Model):
 class Usuario(models.Model):
     usuario_id = models.AutoField(primary_key=True)
     email = models.EmailField(max_length=255, unique=True)
-    contrasena = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
     primer_nombre = models.CharField(max_length=100)
     segundo_nombre = models.CharField(max_length=100, blank=True, null=True)
     primer_apellido = models.CharField(max_length=100)
