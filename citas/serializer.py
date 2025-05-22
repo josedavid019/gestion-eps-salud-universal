@@ -1,28 +1,29 @@
 from rest_framework import serializers
-from .models import citas, consultas
+from .models import Citas, Consultas
 
-class citasSerializer(serializers.ModelSerializer):
+class CitasSerializer(serializers.ModelSerializer):
     class Meta:
-        model = citas
+        model = Citas
         fields = [
             'cita_id',
             'fecha_cita',
+            'hora_cita',
             'estado',
             'fecha_creacion',
             'fecha_actualizacion',
-            'paciente',
-            'doctor',
+            'usuario',
             'unidad',
         ]
 
-class consultasSerializer(serializers.ModelSerializer):
+class ConsultasSerializer(serializers.ModelSerializer):
     class Meta:
-        model = consultas
+        model = Consultas
         fields = [
             'consulta_id',
             'fecha_atencion',
             'sintomas',
             'tratamiento',
+            'recomendaciones',
             'fecha_creacion',
             'fecha_actualizacion',
             'cita',

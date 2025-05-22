@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from .models import doctor
-from .serializer import doctorSerializer
+from .models import JornadasLaborales
+from .serializer import JornadasLaboralesSerializer
 
-class doctorView(viewsets.ModelViewSet):
-    serializer_class = doctorSerializer
-    queryset = doctor.objects.all()
+class JornadasLaboralesView(viewsets.ModelViewSet):
+    serializer_class = JornadasLaboralesSerializer
+    queryset = JornadasLaborales.objects.all()

@@ -1,11 +1,11 @@
 from rest_framework import viewsets
-from .models import citas, consultas
-from .serializer import citasSerializer, consultasSerializer
+from .models import Citas, Consultas
+from .serializer import CitasSerializer, ConsultasSerializer
 
-class citasView(viewsets.ModelViewSet):
-    serializer_class = citasSerializer
-    queryset = citas.objects.all()
+class CitasView(viewsets.ModelViewSet):
+    serializer_class = CitasSerializer
+    queryset = Citas.objects.all()
 
-class consultasView(viewsets.ModelViewSet):
-    serializer_class = consultasSerializer
-    queryset = consultas.objects.all()
+class ConsultasView(viewsets.ModelViewSet):
+    serializer_class = ConsultasSerializer
+    queryset = Consultas.objects.all()

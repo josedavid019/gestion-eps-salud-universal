@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from .models import unidadades_medicas
-from .serializer import unidadadesMediacasSerializer
+from .models import UnidadesMedicas
+from .serializer import UnidadesMedicasSerializer
 
-class unidadadesMediacasView(viewsets.ModelViewSet):
-    serializer_class = unidadadesMediacasSerializer
-    queryset = unidadades_medicas.objects.all()
+class UnidadesMedicasView(viewsets.ModelViewSet):
+    serializer_class = UnidadesMedicasSerializer
+    queryset = UnidadesMedicas.objects.all()

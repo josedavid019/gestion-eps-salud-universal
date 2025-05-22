@@ -1,17 +1,13 @@
 from rest_framework import serializers
-from .models import doctor
+from .models import JornadasLaborales
 
-class doctorSerializer(serializers.ModelSerializer):
+class JornadasLaboralesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = doctor
+        model = JornadasLaborales
         fields = [
-            'doctor_id',
-            'identificacion',
-            'direccion',
-            'telefono',
-            'especialidad',
+            'jornada_id',
+            'nombre',
+            'descripcion',
             'fecha_creacion',
-            'fecha_actualizacion',
-            'jornada',
-            'usuario',
+            'fecha_actualizacion'
         ]

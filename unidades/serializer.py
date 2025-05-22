@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import unidadades_medicas
+from .models import UnidadesMedicas
 
-class unidadadesMediacasSerializer(serializers.ModelSerializer):
+class UnidadesMedicasSerializer(serializers.ModelSerializer):
     class Meta:
-        model = unidadades_medicas
+        model = UnidadesMedicas
         fields = [
             'unidad_id',
             'nombre',
@@ -11,5 +11,6 @@ class unidadadesMediacasSerializer(serializers.ModelSerializer):
             'planta',
             'fecha_creacion',
             'fecha_actualizacion',
-            'doctor',
+            'activo',
+            'usuario',
         ]
