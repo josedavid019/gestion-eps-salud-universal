@@ -1,9 +1,8 @@
 import axios from "axios";
 
-// Instancia de Axios configurada para las rutas de paciente
-const pacienteApi = axios.create({
-  baseURL: "http://localhost:8000/pacientes/api/",
+const usuariosApi = axios.create({
+  baseURL: "http://127.0.0.1:8000/usuarios/api/",
 });
 
-export const registrarPaciente = async (paciente) =>
-  pacienteApi.post("registrar/", paciente);
+export const registrarUsuario = async (usuario) =>
+  usuariosApi.post("registrar/", usuario);

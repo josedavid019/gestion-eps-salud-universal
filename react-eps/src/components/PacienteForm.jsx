@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { registrarPaciente } from "../api/usuarios.api";
+import { registrarUsuario } from "../api/usuarios.api";
 
 export function PacienteForm() {
   const navigate = useNavigate();
@@ -23,8 +23,8 @@ export function PacienteForm() {
    */
   const onSubmit = async (data) => {
     try {
-      await registrarPaciente({ ...data, role: 1 }); // role fijo para paciente
-      toast.success("¡Paciente registrado con éxito!", {
+      await registrarUsuario({ ...data, role: 1 }); // role fijo para paciente
+      toast.success("!Registrado con éxito!", {
         position: "bottom-right",
         style: {
           background: "#0d6efd",
@@ -161,43 +161,24 @@ export function PacienteForm() {
         </div>
       </div>
 
-      {/* Dirección */}
-      <div className="mb-3">
-        <label htmlFor="direccion" className="form-label">
-          Dirección
-        </label>
-        <input
-          id="direccion"
-          className="form-control"
-          type="text"
-          {...register("direccion", {
-            required: "Dirección es requerida",
-            minLength: { value: 5, message: "Muy corta" },
-          })}
-        />
-        {errors.direccion && (
-          <span className="text-danger">{errors.direccion.message}</span>
-        )}
-      </div>
-
       {/* Edad y afiliación */}
       <div className="row">
         <div className="col mb-3">
-          <label htmlFor="edad" className="form-label">
-            Edad
+          <label htmlFor="fecha_nacimiento" className="form-label">
+            Fecha de nacimiento
           </label>
           <input
-            id="edad"
+            id="fecha_nacimiento"
             className="form-control"
-            type="number"
-            {...register("edad", {
-              required: "Edad es requerida",
-              min: { value: 0, message: "Edad inválida" },
-              max: { value: 120, message: "Edad no puede ser mayor a 120" },
+            type="date"
+            {...register("fecha_nacimiento", {
+              required: "Fecha de nacimiento es requerida",
             })}
           />
-          {errors.edad && (
-            <span className="text-danger">{errors.edad.message}</span>
+          {errors.fecha_nacimiento && (
+            <span className="text-danger">
+              {errors.fecha_nacimiento.message}
+            </span>
           )}
         </div>
 
@@ -222,6 +203,69 @@ export function PacienteForm() {
             <span className="text-danger">{errors.afiliacion.message}</span>
           )}
         </div>
+      </div>
+
+      {/* Genero y telefono */}
+      <div className="row">
+        <div className="col mb-3">
+          <label htmlFor="genero" className="form-label">
+            Genero
+          </label>
+          <select
+            id="genero"
+            className="form-select"
+            {...register("genero", {
+              required: "Genero es requerido",
+            })}
+          >
+            <option value="">Seleccione...</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+          {errors.genero && (
+            <span className="text-danger">{errors.genero.message}</span>
+          )}
+        </div>
+
+        <div className="col mb-3">
+          <label htmlFor="telefono" className="form-label">
+            Telefono
+          </label>
+          <input
+            id="telefono"
+            className="form-control"
+            type="tel"
+            {...register("telefono", {
+              required: "Telefono es requerido",
+              pattern: {
+                value: /^\d{10}$/,
+                message: "Solo números",
+              },
+            })}
+          />
+          {errors.telefono && (
+            <span className="text-danger">{errors.telefono.message}</span>
+          )}
+        </div>
+      </div>
+
+      {/* Dirección */}
+      <div className="mb-3">
+        <label htmlFor="direccion" className="form-label">
+          Dirección
+        </label>
+        <input
+          id="direccion"
+          className="form-control"
+          type="text"
+          {...register("direccion", {
+            required: "Dirección es requerida",
+            minLength: { value: 5, message: "Muy corta" },
+          })}
+        />
+        {errors.direccion && (
+          <span className="text-danger">{errors.direccion.message}</span>
+        )}
       </div>
 
       {/* Email */}
