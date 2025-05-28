@@ -6,10 +6,10 @@ from django.db import migrations, models
 def create_tipos_afiliacion(apps, schema_editor):
     TipoAfiliacion = apps.get_model('pacientes', 'TipoAfiliacion')
     TipoAfiliacion.objects.bulk_create([
-        TipoAfiliacion(nombre='Contributivo', descripcion='Afiliados que aportan al sistema mediante pagos mensuales.'),
-        TipoAfiliacion(nombre='Subsidiado', descripcion='Afiliados cubiertos por el Estado debido a su falta de ingresos.'),
-        TipoAfiliacion(nombre='Especial', descripcion='Personas cubiertas por regímenes especiales o entidades específicas.'),
-        TipoAfiliacion(nombre='Vinculado', descripcion='Usuarios registrados pero aún no afiliados formalmente.'),
+        TipoAfiliacion(nombre='contributivo', descripcion='Afiliados que aportan al sistema mediante pagos mensuales.'),
+        TipoAfiliacion(nombre='subsidiado', descripcion='Afiliados cubiertos por el Estado debido a su falta de ingresos.'),
+        TipoAfiliacion(nombre='especial', descripcion='Personas cubiertas por regímenes especiales o entidades específicas.'),
+        TipoAfiliacion(nombre='vinculado', descripcion='Usuarios registrados pero aún no afiliados formalmente.'),
     ])
 
 class Migration(migrations.Migration):

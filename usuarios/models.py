@@ -34,3 +34,7 @@ class Usuarios(models.Model):
 
     def __str__(self):
         return f"{self.primer_nombre} {self.primer_apellido}"
+    
+    @property
+    def id(self):
+        return self.usuario_id

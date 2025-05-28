@@ -1,77 +1,117 @@
-// src/pages/Login.jsx
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { loginUsuario } from "../api/usuarios.api";
+import { useAuth } from "../context/AuthContext";
 
-export default function Login() {
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
+export function Login() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  const onSubmit = async (data) => {
+    try {
+      const response = await loginUsuario(data);
+      login(response.data);
+      // Guardar token en localStorage
+      localStorage.setItem("token", response.data.access);
+      localStorage.setItem("refresh", response.data.refresh);
 
-    // Administrador
-    if (id === 'admin' && password === 'admin') {
-      localStorage.setItem('role', 'admin');
-      navigate('/admin');
-      return;
+      toast.success("Inicio de sesión exitoso", {
+        position: "bottom-right",
+        style: {
+          background: "#0d6efd",
+          color: "#fff",
+        },
+      });
+      navigate("/home");
+    } catch (error) {
+      const msg =
+        error.response?.data?.detail ||
+        Object.values(error.response?.data || {})
+          .flat()
+          .join(" ") ||
+        "Error al iniciar sesión";
+
+      toast.error(`Error: ${msg}`, {
+        position: "bottom-right",
+        style: {
+          background: "#dc3545",
+          color: "#fff",
+        },
+      });
     }
-
-    // Doctor
-    if (id === 'doc' && password === 'doc') {
-      localStorage.setItem('role', 'doctor');
-      navigate('/doctor-home');
-      return;
-    }
-
-    // Paciente
-    if (id && password) {
-      localStorage.setItem('role', 'patient');
-      navigate('/home');
-      return;
-    }
-
-    alert('Por favor ingrese credenciales válidas');
-  }
+  };
 
   return (
-    <div className="d-flex vh-100 align-items-center justify-content-center bg-light">
-      <form
-        className="p-4 bg-white rounded shadow-sm"
-        style={{ width: '320px' }}
-        onSubmit={handleSubmit}
-      >
-        <h2 className="mb-4 text-center">Inicio de Sesión</h2>
-        <div className="mb-3">
-          <label className="form-label">Identificación</label>
-          <input
-            type="text"
-            className="form-control"
-            value={id}
-            onChange={e => setId(e.target.value)}
-            placeholder="Número de identificación"
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Contraseña</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="Contraseña"
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary w-100">Entrar</button>
-        <div className="text-center mt-3">
-          <small>
-            ¿No tienes cuenta?{' '}
-            <Link to="/register">Regístrate aquí</Link>
-          </small>
-        </div>
-      </form>
-    </div>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="p-4 bg-white rounded shadow-sm border mt-5 mx-auto"
+      style={{ maxWidth: "400px" }}
+      autoComplete="off"
+    >
+      <h2 className="mb-4 text-center">Iniciar Sesion</h2>
+
+      {/* Identificación */}
+      <div className="mb-3">
+        <label htmlFor="identificacion" className="form-label">
+          Identificación
+        </label>
+        <input
+          id="identificacion"
+          className="form-control"
+          type="text"
+          autoFocus
+          {...register("identificacion", {
+            required: "Identificación es requerida",
+          })}
+        />
+        {errors.identificacion && (
+          <div className="text-danger small">
+            {errors.identificacion.message}
+          </div>
+        )}
+      </div>
+
+      {/* Contraseña */}
+      <div className="mb-3">
+        <label htmlFor="password" className="form-label">
+          Contraseña
+        </label>
+        <input
+          id="password"
+          className="form-control"
+          type="password"
+          {...register("password", {
+            required: "Contraseña es requerida",
+            minLength: { value: 8, message: "Mínimo 8 caracteres" },
+          })}
+        />
+        {errors.password && (
+          <div className="text-danger small">{errors.password.message}</div>
+        )}
+      </div>
+
+      <div className="d-grid">
+        <button type="submit" className="btn btn-primary">
+          Entrar
+        </button>
+      </div>
+
+      <div className="text-center mt-3">
+        <small className="text-muted">
+          ¿No tienes cuenta?{" "}
+          <Link to="/registrar" className="text-decoration-none fw-semibold">
+            Regístrate aquí
+          </Link>
+        </small>
+      </div>
+    </form>
   );
 }

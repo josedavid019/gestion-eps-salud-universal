@@ -2,8 +2,10 @@ from rest_framework import serializers
 from .models import Usuarios, Roles
 from pacientes.models import TipoAfiliacion
 from doctores.models import JornadasLaborales
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.db import transaction
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class RolesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,3 +81,29 @@ class UsuarioRegisterSerializer(serializers.Serializer):
                 password=make_password(password),
             )
             return usuario
+        
+class CustomTokenObtainSerializer(serializers.Serializer):
+    identificacion = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        identificacion = attrs.get("identificacion")
+        password = attrs.get("password")
+
+        try:
+            usuario = Usuarios.objects.get(identificacion=identificacion)
+        except Usuarios.DoesNotExist:
+            raise AuthenticationFailed("Identificación o contraseña inválida")
+
+        if not check_password(password, usuario.password):
+            raise AuthenticationFailed("Identificación o contraseña inválida")
+
+        refresh = RefreshToken.for_user(usuario)
+
+        return {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "usuario_id": usuario.usuario_id,
+            "role": usuario.role.nombre,
+            "nombres": f"{usuario.primer_nombre} {usuario.primer_apellido}"
+        }

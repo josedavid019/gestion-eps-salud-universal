@@ -6,9 +6,9 @@ from django.db import migrations, models
 def create_roles(apps, schema_editor):
     Roles = apps.get_model('usuarios', 'Roles')
     Roles.objects.bulk_create([
-        Roles(nombre='Paciente', descripcion='Paciente del sistema'),
-        Roles(nombre='Doctor', descripcion='Doctor del sistema'),
-        Roles(nombre='Admin', descripcion='Administrador del sistema'),
+        Roles(nombre='paciente', descripcion='Paciente del sistema'),
+        Roles(nombre='doctor', descripcion='Doctor del sistema'),
+        Roles(nombre='admin', descripcion='Administrador del sistema'),
     ])
 
 class Migration(migrations.Migration):

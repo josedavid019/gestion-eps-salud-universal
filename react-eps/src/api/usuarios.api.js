@@ -6,3 +6,6 @@ const usuariosApi = axios.create({
 
 export const registrarUsuario = async (usuario) =>
   usuariosApi.post("registrar/", usuario);
+
+export const loginUsuario = async (usuario) =>
+  usuariosApi.post("login/", usuario);
