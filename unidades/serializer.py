@@ -12,5 +12,4 @@ class UnidadesMedicasSerializer(serializers.ModelSerializer):
             'fecha_creacion',
             'fecha_actualizacion',
             'activo',
-            'usuario',
         ]

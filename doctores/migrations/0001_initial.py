@@ -2,6 +2,12 @@
 
 from django.db import migrations, models
 
+def create_jornadas_laborales(apps, schema_editor):
+    Jornada = apps.get_model('doctores', 'JornadasLaborales')
+    Jornada.objects.bulk_create([
+        Jornada(nombre='matinal', descripcion='Horario de la mañana'),
+        Jornada(nombre='vespertina', descripcion='Horario de la tarde'),
+    ])
 
 class Migration(migrations.Migration):
 
@@ -21,4 +27,5 @@ class Migration(migrations.Migration):
                 ('fecha_actualizacion', models.DateTimeField(auto_now=True)),
             ],
         ),
+        migrations.RunPython(create_jornadas_laborales),
     ]

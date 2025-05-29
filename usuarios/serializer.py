@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Usuarios, Roles
 from pacientes.models import TipoAfiliacion
 from doctores.models import JornadasLaborales
+from unidades.models import UnidadesMedicas
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import transaction
 from rest_framework.exceptions import AuthenticationFailed
@@ -41,7 +42,8 @@ class UsuariosSerializer(serializers.ModelSerializer):
             'activo',
             'role',
             'afiliacion',
-            'jornada'
+            'jornada',
+            'unidad',
         ]
 
 class UsuarioRegisterSerializer(serializers.Serializer):
@@ -59,9 +61,11 @@ class UsuarioRegisterSerializer(serializers.Serializer):
     direccion = serializers.CharField()
     telefono = serializers.CharField()
     fecha_nacimiento = serializers.DateField()
+    especialidad = serializers.CharField(required=False, allow_blank=True)
     fecha_ingreso = serializers.DateField()
     afiliacion = serializers.PrimaryKeyRelatedField(queryset=TipoAfiliacion.objects.all(), required=False, allow_null=True)
     jornada = serializers.PrimaryKeyRelatedField(queryset=JornadasLaborales.objects.all(), required=False, allow_null=True)
+    unidad = serializers.PrimaryKeyRelatedField(queryset=UnidadesMedicas.objects.all(), required=False, allow_null=True)
 
     def validate_email(self, value):
         if Usuarios.objects.filter(email=value).exists():
@@ -104,6 +108,7 @@ class CustomTokenObtainSerializer(serializers.Serializer):
             "refresh": str(refresh),
             "access": str(refresh.access_token),
             "usuario_id": usuario.usuario_id,
-            "role": usuario.role.nombre,
-            "nombres": f"{usuario.primer_nombre} {usuario.primer_apellido}"
+            "nombres": f"{usuario.primer_nombre} {usuario.primer_apellido}",
+            "identificacion": usuario.identificacion,
+            "role": usuario.role.nombre
         }

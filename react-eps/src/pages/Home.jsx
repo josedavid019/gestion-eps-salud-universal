@@ -1,58 +1,59 @@
 // src/pages/Home.jsx
 import React from "react";
-import DoctorHome from "./DoctorHome";
+import { useAuth } from "../context/AuthContext";
 
 export function Home() {
-  const role = localStorage.getItem("role");
+  const { user, logout } = useAuth();
 
-  if (role === "doctor") {
-    return <DoctorHome />;
-  }
+  // Mock de citas futuras
+  const citas = [
+    { fecha: "2025-06-01", hora: "10:00", doctor: "Dr. Juan Pérez" },
+    { fecha: "2025-06-10", hora: "15:00", doctor: "Dra. María Gómez" },
+  ];
 
-  const unidades = [
-    {
-      id: 1,
-      nombre: "Pediatría",
-      planta: 1,
-      doctor: "Dr. Juan Pérez",
-      foto: "/images/doctor-juan.png",
-    },
-    {
-      id: 2,
-      nombre: "Fractura",
-      planta: 2,
-      doctor: "Dra. María Gómez",
-      foto: "/images/doctora-maria.png",
-    },
-    {
-      id: 3,
-      nombre: "General",
-      planta: 3,
-      doctor: "Dr. Carlos Ruiz",
-      foto: "/images/doctor-carlos.png",
-    },
+  // Mock de avisos
+  const avisos = [
+    "Recuerda actualizar tus datos personales.",
+    "Vacunación contra la influenza disponible en todas las unidades.",
   ];
 
   return (
-    <div className="container-fluid my-4 px-2">
-      <h1 className="text-center mb-4">EPS Salud Universal</h1>
-      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-        {unidades.map((u) => (
-          <div key={u.id} className="col">
-            <div className="card h-100">
-              <img src={u.foto} className="card-img-top" alt={u.doctor} />
-              <div className="card-body">
-                <h5 className="card-title">{u.nombre}</h5>
-                <p className="card-text mb-0">
-                  <strong>Planta:</strong> {u.planta}
-                </p>
-                <p className="card-text">
-                  <strong>Doctor:</strong> {u.doctor}
-                </p>
-              </div>
+    <div>
+      {/* Contenido principal */}
+      <div className="container mt-4">
+        {/* Bienvenida */}
+        <h2 className="mb-4">¡Bienvenido, {user?.nombres || "Paciente"}!</h2>
+
+        {/* Calendario de próximas citas */}
+        <div className="card mb-4">
+          <div className="card-header bg-info text-white">Próximas citas</div>
+          <ul className="list-group list-group-flush">
+            {citas.length > 0 ? (
+              citas.map((cita, idx) => (
+                <li key={idx} className="list-group-item">
+                  <strong>Fecha:</strong> {cita.fecha} — <strong>Hora:</strong>{" "}
+                  {cita.hora} — <strong>Doctor:</strong> {cita.doctor}
+                </li>
+              ))
+            ) : (
+              <li className="list-group-item">No tienes citas programadas.</li>
+            )}
+          </ul>
+        </div>
+
+        {/* Recomendaciones o avisos */}
+        {avisos.length > 0 && (
+          <div className="card mb-4">
+            <div className="card-header bg-warning">Avisos importantes</div>
+            <div className="card-body">
+              <ul className="mb-0">
+                {avisos.map((aviso, idx) => (
+                  <li key={idx}>{aviso}</li>
+                ))}
+              </ul>
             </div>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

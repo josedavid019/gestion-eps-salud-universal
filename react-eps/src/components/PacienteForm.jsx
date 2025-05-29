@@ -31,7 +31,7 @@ export function PacienteForm() {
           color: "#fff",
         },
       });
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       const responseData = error.response?.data;
       const mensajeError = responseData

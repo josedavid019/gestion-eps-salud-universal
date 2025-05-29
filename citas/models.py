@@ -7,7 +7,8 @@ class Citas(models.Model):
     estado = models.CharField(max_length=100)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-    usuario = models.ForeignKey('usuarios.Usuarios', on_delete=models.CASCADE)
+    usuario = models.ForeignKey('usuarios.Usuarios', on_delete=models.CASCADE, related_name='citas_paciente')  # paciente
+    doctor = models.ForeignKey('usuarios.Usuarios', on_delete=models.SET_NULL, null=True, related_name='citas_doctor')  # doctor
     unidad = models.ForeignKey('unidades.UnidadesMedicas', on_delete=models.CASCADE)
 
     def __str__(self):

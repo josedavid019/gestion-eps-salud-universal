@@ -8,7 +8,7 @@ export default function ProtectedRoute({ requiredRole }) {
 
   // Si no hay usuario logueado, redirige al login
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // Si se requiere un rol específico y no coincide

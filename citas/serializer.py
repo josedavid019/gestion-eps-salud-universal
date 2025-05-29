@@ -12,6 +12,7 @@ class CitasSerializer(serializers.ModelSerializer):
             'fecha_creacion',
             'fecha_actualizacion',
             'usuario',
+            'doctor',
             'unidad',
         ]
 

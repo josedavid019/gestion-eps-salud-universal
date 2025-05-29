@@ -31,6 +31,7 @@ class Usuarios(models.Model):
     role = models.ForeignKey(Roles, on_delete=models.CASCADE)
     afiliacion = models.ForeignKey('pacientes.TipoAfiliacion', on_delete=models.CASCADE, blank=True, null=True) # Paciente
     jornada = models.ForeignKey('doctores.JornadasLaborales', on_delete=models.CASCADE, blank=True, null=True) # Doctor
+    unidad = models.ForeignKey('unidades.UnidadesMedicas', on_delete=models.CASCADE, blank=True, null=True) # Doctor
 
     def __str__(self):
         return f"{self.primer_nombre} {self.primer_apellido}"

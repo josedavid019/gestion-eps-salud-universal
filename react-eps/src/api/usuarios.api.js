@@ -9,3 +9,9 @@ export const registrarUsuario = async (usuario) =>
 
 export const loginUsuario = async (usuario) =>
   usuariosApi.post("login/", usuario);
+
+export const getDoctoresPorUnidad = async (unidadId) =>
+  usuariosApi.get(`doctores/?unidad_id=${unidadId}`);
+
+export const getJornadaDoctor = async (doctorId) =>
+  usuariosApi.get(`doctores/${doctorId}/jornada/`);
