@@ -1,10 +1,19 @@
 from django.db import models
 
 class Citas(models.Model):
+    ESTADOS_CITA = [
+        ('pendiente', 'Pendiente'),
+        ('confirmada', 'Confirmada'),
+        ('rechazada', 'Rechazada'),
+        ('cancelada', 'Cancelada'),
+        ('atendida', 'Atendida'),
+        ('no_atendida', 'No Atendida'),
+    ]
+
     cita_id = models.AutoField(primary_key=True)
     fecha_cita = models.DateField()
     hora_cita = models.TimeField()
-    estado = models.CharField(max_length=100)
+    estado = models.CharField(max_length=20, choices=ESTADOS_CITA, default='pendiente')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     usuario = models.ForeignKey('usuarios.Usuarios', on_delete=models.CASCADE, related_name='citas_paciente')  # paciente

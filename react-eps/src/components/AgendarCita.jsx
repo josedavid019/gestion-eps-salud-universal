@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { getDoctoresPorUnidad, getJornadaDoctor } from "../api/usuarios.api";
@@ -16,6 +17,7 @@ registerLocale("es", es);
 
 export function AgendarCita() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const {
     watch,
     register,
@@ -69,8 +71,8 @@ export function AgendarCita() {
 
   const generarHoras = () => {
     const horas = [];
-    const inicio = jornada === "matinal" ? 8 : 14;
-    const fin = jornada === "matinal" ? 12 : 18;
+    const inicio = jornada === "matinal" ? 7 : 13; // 07:00 o 13:00
+    const fin = inicio + 5; // 5 horas después
 
     for (let h = inicio; h < fin; h++) {
       horas.push(`${h.toString().padStart(2, "0")}:00`);

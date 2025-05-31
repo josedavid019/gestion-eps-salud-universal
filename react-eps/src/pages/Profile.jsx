@@ -1,33 +1,33 @@
 // src/pages/Profile.jsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export default function Profile() {
-  const role = localStorage.getItem('role');
+  const role = localStorage.getItem("role");
 
   // Mock de datos del usuario
   const [formData, setFormData] = useState({
-    nombre: 'Juan Pérez',
-    email: 'juan@example.com',
-    telefono: '3001234567',
-    password: '',
-    confirmPassword: ''
+    nombre: "Juan Pérez",
+    email: "juan@example.com",
+    telefono: "3001234567",
+    password: "",
+    confirmPassword: "",
   });
 
   const [success, setSuccess] = useState(false);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (formData.password && formData.password !== formData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      alert("Las contraseñas no coinciden");
       return;
     }
 

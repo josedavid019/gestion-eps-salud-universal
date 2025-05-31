@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from .models import Citas, Consultas
 from .serializer import CitasSerializer, ConsultasSerializer
 from rest_framework.decorators import api_view
@@ -49,3 +49,9 @@ def horas_ocupadas_doctor(request, doctor_id):
 
     horas_str = [hora.strftime("%H:%M") for hora in horas if hora is not None]
     return Response(horas_str)
+
+@api_view(['GET'])
+def citas_por_paciente(request, usuario_id):
+    citas = Citas.objects.filter(usuario_id=usuario_id).order_by('-fecha_cita', '-hora_cita')
+    serializer = CitasSerializer(citas, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

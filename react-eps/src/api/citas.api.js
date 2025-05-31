@@ -17,3 +17,6 @@ export const getHorasOcupadas = async (doctorId, fecha) => {
     `doctor/${doctorId}/horas-ocupadas/?fecha=${formattedFecha}`
   );
 };
+
+export const getCitasPorPaciente = async (usuario_id) =>
+  citasApi.get(`paciente/${usuario_id}/`);

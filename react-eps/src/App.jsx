@@ -10,7 +10,7 @@ import ProtectedRoutes from "./routes/ProtectedRoutes";
 // Pacientes
 import { Home } from "./pages/Home";
 import { AgendarCita } from "./components/AgendarCita";
-import MisCitas from "./pages/MisCitas";
+import { MisCitas } from "./pages/MisCitas";
 import HistorialClinico from "./pages/HistorialClinico";
 import Profile from "./pages/Profile";
 

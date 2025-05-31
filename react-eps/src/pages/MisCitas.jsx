@@ -1,70 +1,63 @@
-// src/pages/MisCitas.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { getCitasPorPaciente } from "../api/citas.api";
 
-export default function MisCitas() {
-  // Datos de ejemplo; más adelante los traerás de tu API
-  const [citas, setCitas] = useState([
-    {
-      id: 1,
-      unidad: 'Pediatría',
-      doctor: 'Dr. Juan Pérez',
-      fecha: '2025-05-20',
-      hora: '09:30',
-      estado: 'Confirmada'
-    },
-    {
-      id: 2,
-      unidad: 'General',
-      doctor: 'Dr. Carlos Ruiz',
-      fecha: '2025-05-22',
-      hora: '14:00',
-      estado: 'Pendiente'
-    }
-  ]);
+export function MisCitas() {
+  const { user } = useAuth();
+  const [citas, setCitas] = useState([]);
 
-  // En el futuro: usar useEffect + fetch a /api/citas
-  // useEffect(() => {
-  //   fetchMisCitas().then(data => setCitas(data));
-  // }, []);
+  useEffect(() => {
+    if (!user || !user.usuario_id) return;
+
+    getCitasPorPaciente(user.usuario_id)
+      .then(({ data }) => {
+        const citasFormateadas = data.map((cita) => ({
+          id: cita.cita_id || cita.id,
+          unidad: cita.unidad?.nombre || `Unidad ${cita.unidad}`,
+          doctor: cita.doctor
+            ? `${cita.doctor.primer_nombre} ${cita.doctor.primer_apellido}`
+            : `Doctor ${cita.doctor}`,
+          fecha: cita.fecha_cita,
+          hora: cita.hora_cita,
+          estado: cita.estado.charAt(0).toUpperCase() + cita.estado.slice(1),
+        }));
+
+        setCitas(citasFormateadas);
+      })
+      .catch((error) => {
+        console.error("Error al obtener citas:", error);
+      });
+  }, [user]);
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <h5 className="mb-0">Mis Citas</h5>
-      </div>
-      <div className="card-body p-0">
-        <div className="table-responsive">
-          <table className="table mb-0">
-            <thead className="table-light">
-              <tr>
-                <th>Unidad</th>
-                <th>Doctor</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Estado</th>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Mis Citas</h1>
+      {citas.length === 0 ? (
+        <p>No tienes citas registradas.</p>
+      ) : (
+        <table className="w-full table-auto border-collapse">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border px-4 py-2">Unidad Médica</th>
+              <th className="border px-4 py-2">Doctor</th>
+              <th className="border px-4 py-2">Fecha</th>
+              <th className="border px-4 py-2">Hora</th>
+              <th className="border px-4 py-2">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {citas.map((cita) => (
+              <tr key={cita.id}>
+                <td className="border px-4 py-2">{cita.unidad}</td>
+                <td className="border px-4 py-2">{cita.doctor}</td>
+                <td className="border px-4 py-2">{cita.fecha}</td>
+                <td className="border px-4 py-2">{cita.hora}</td>
+                <td className="border px-4 py-2">{cita.estado}</td>
               </tr>
-            </thead>
-            <tbody>
-              {citas.map(c => (
-                <tr key={c.id}>
-                  <td>{c.unidad}</td>
-                  <td>{c.doctor}</td>
-                  <td>{c.fecha}</td>
-                  <td>{c.hora}</td>
-                  <td>{c.estado}</td>
-                </tr>
-              ))}
-              {citas.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="text-center py-3">
-                    No tienes citas agendadas.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
