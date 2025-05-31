@@ -131,7 +131,6 @@ export function AgendarCita() {
         estado: "pendiente",
         fecha_cita: data.fecha_cita.toISOString().split("T")[0],
       };
-
       await registrarCita(cita);
       toast.success("Cita agendada correctamente");
       reset();

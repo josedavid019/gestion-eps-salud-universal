@@ -6,8 +6,9 @@ from usuarios.serializer import UsuariosSerializer
 from unidades.serializer import UnidadesMedicasSerializer
 
 class CitasSerializer(serializers.ModelSerializer):
-    doctor = UsuariosSerializer(read_only=True)
-    unidad = UnidadesMedicasSerializer(read_only=True)
+    doctor = serializers.PrimaryKeyRelatedField(queryset=Usuarios.objects.all())
+    unidad = serializers.PrimaryKeyRelatedField(queryset=UnidadesMedicas.objects.all())
+    usuario = serializers.PrimaryKeyRelatedField(queryset=Usuarios.objects.all())
 
     class Meta:
         model = Citas
@@ -22,6 +23,13 @@ class CitasSerializer(serializers.ModelSerializer):
             'doctor',
             'unidad',
         ]
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['usuario'] = UsuariosSerializer(instance.usuario).data
+        rep['doctor'] = UsuarioDoctorSerializer(instance.doctor).data if instance.doctor else None
+        rep['unidad'] = UnidadesMedicasSerializer(instance.unidad).data
+        return rep
 
 class ConsultasSerializer(serializers.ModelSerializer):
     class Meta:

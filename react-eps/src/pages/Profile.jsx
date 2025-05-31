@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 
 export function Profile() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const userId = user?.id || user?.usuario_id;
 
   const {
@@ -59,6 +61,7 @@ export function Profile() {
         updatedData
       );
       toast.success("Perfil actualizado correctamente");
+      navigate("/home");
     } catch (error) {
       toast.error("Error al actualizar el perfil");
     }
