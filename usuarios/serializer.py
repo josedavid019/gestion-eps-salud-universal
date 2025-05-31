@@ -112,3 +112,61 @@ class CustomTokenObtainSerializer(serializers.Serializer):
             "identificacion": usuario.identificacion,
             "role": usuario.role.nombre
         }
+    
+class UsuarioPerfilSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False, min_length=8)
+    confirmar_password = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = Usuarios
+        fields = [
+            'identificacion',
+            'primer_nombre',
+            'segundo_nombre',
+            'primer_apellido',
+            'segundo_apellido',
+            'genero',
+            'fecha_nacimiento',
+            'email',
+            'direccion',
+            'telefono',
+            'password',
+            'confirmar_password',
+        ]
+        read_only_fields = [
+            'identificacion',
+            'primer_nombre',
+            'segundo_nombre',
+            'primer_apellido',
+            'segundo_apellido',
+            'genero',
+            'fecha_nacimiento',
+        ]
+
+    def validate_email(self, value):
+        usuario = self.context.get('usuario')
+        if Usuarios.objects.filter(email=value).exclude(pk=usuario.pk).exists():
+            raise serializers.ValidationError("Este email ya está en uso por otro usuario.")
+        return value
+
+    def validate(self, data):
+        password = data.get("password")
+        confirmar_password = data.get("confirmar_password")
+
+        if password or confirmar_password:
+            if password != confirmar_password:
+                raise serializers.ValidationError({"confirmar_password": "Las contraseñas no coinciden."})
+        return data
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        validated_data.pop("confirmar_password", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if password:
+            instance.password = make_password(password)
+
+        instance.save()
+        return instance

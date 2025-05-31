@@ -12,7 +12,7 @@ import { Home } from "./pages/Home";
 import { AgendarCita } from "./components/AgendarCita";
 import { MisCitas } from "./pages/MisCitas";
 import HistorialClinico from "./pages/HistorialClinico";
-import Profile from "./pages/Profile";
+import { Profile } from "./pages/Profile";
 
 // Doctores
 import DoctorHome from "./pages/DoctorHome";

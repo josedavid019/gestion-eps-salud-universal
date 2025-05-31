@@ -1,126 +1,254 @@
-// src/pages/Profile.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
-export default function Profile() {
-  const role = localStorage.getItem("role");
+export function Profile() {
+  const { user } = useAuth();
+  const userId = user?.id || user?.usuario_id;
 
-  // Mock de datos del usuario
-  const [formData, setFormData] = useState({
-    nombre: "Juan Pérez",
-    email: "juan@example.com",
-    telefono: "3001234567",
-    password: "",
-    confirmPassword: "",
-  });
+  const {
+    watch,
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
-  const [success, setSuccess] = useState(false);
+  useEffect(() => {
+    if (!userId) return;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+    axios
+      .get(`http://127.0.0.1:8000/usuarios/api/perfil/${userId}/`)
+      .then((res) => {
+        const fields = [
+          "identificacion",
+          "primer_nombre",
+          "segundo_nombre",
+          "primer_apellido",
+          "segundo_apellido",
+          "genero",
+          "fecha_nacimiento",
+          "email",
+          "direccion",
+          "telefono",
+        ];
+        fields.forEach((field) => setValue(field, res.data[field]));
+      })
+      .catch(() => {
+        toast.error("Error al cargar datos del perfil");
+      });
+  }, [userId, setValue]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
+    const updatedData = {
+      email: data.email,
+      direccion: data.direccion,
+      telefono: data.telefono,
+    };
 
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      alert("Las contraseñas no coinciden");
-      return;
+    if (data.password) {
+      updatedData.password = data.password;
+      updatedData.confirmar_password = data.confirmar_password || ""; // enviar confirmar_password
     }
 
-    // Aquí se actualizarían los datos (por ahora, solo se muestra una alerta)
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
+    try {
+      await axios.patch(
+        `http://127.0.0.1:8000/usuarios/api/perfil/${userId}/`,
+        updatedData
+      );
+      toast.success("Perfil actualizado correctamente");
+    } catch (error) {
+      toast.error("Error al actualizar el perfil");
+    }
   };
 
   return (
-    <div className="card shadow p-4">
-      <h3 className="mb-4">Perfil de Usuario ({role})</h3>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="p-4 bg-white rounded shadow-sm border mt-5 mx-auto"
+      style={{ maxWidth: "500px" }}
+      autoComplete="off"
+    >
+      <h2 className="mb-4 text-center">Editar Perfil</h2>
 
-      {success && (
-        <div className="alert alert-success" role="alert">
-          Perfil actualizado con éxito.
-        </div>
-      )}
+      {/* Campos no editables */}
+      <div className="mb-3">
+        <label className="form-label">Identificación</label>
+        <input
+          className="form-control"
+          type="text"
+          disabled
+          {...register("identificacion")}
+        />
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="row mb-3">
-          <div className="col-md-6">
-            <label className="form-label">Nombre completo</label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              className="form-control"
-              required
-            />
-          </div>
+      <div className="mb-3">
+        <label className="form-label">Primer Nombre</label>
+        <input
+          className="form-control"
+          type="text"
+          disabled
+          {...register("primer_nombre")}
+        />
+      </div>
 
-          <div className="col-md-6">
-            <label className="form-label">Correo electrónico</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="form-control"
-              required
-            />
-          </div>
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Segundo Nombre</label>
+        <input
+          className="form-control"
+          type="text"
+          disabled
+          {...register("segundo_nombre")}
+        />
+      </div>
 
-        <div className="row mb-3">
-          <div className="col-md-6">
-            <label className="form-label">Número de teléfono</label>
-            <input
-              type="tel"
-              name="telefono"
-              value={formData.telefono}
-              onChange={handleChange}
-              className="form-control"
-              required
-            />
-          </div>
+      <div className="mb-3">
+        <label className="form-label">Primer Apellido</label>
+        <input
+          className="form-control"
+          type="text"
+          disabled
+          {...register("primer_apellido")}
+        />
+      </div>
 
-          <div className="col-md-6">
-            <label className="form-label">Nueva contraseña (opcional)</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="form-control"
-              placeholder="Dejar en blanco si no desea cambiar"
-            />
-          </div>
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Segundo Apellido</label>
+        <input
+          className="form-control"
+          type="text"
+          disabled
+          {...register("segundo_apellido")}
+        />
+      </div>
 
-        {formData.password && (
-          <div className="row mb-3">
-            <div className="col-md-6">
-              <label className="form-label">Confirmar nueva contraseña</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="form-control"
-                required
-              />
-            </div>
+      <div className="mb-3">
+        <label className="form-label">Género</label>
+        <input
+          className="form-control"
+          type="text"
+          disabled
+          {...register("genero")}
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Fecha de Nacimiento</label>
+        <input
+          className="form-control"
+          type="date"
+          disabled
+          {...register("fecha_nacimiento")}
+        />
+      </div>
+
+      {/* Campos editables */}
+
+      <div className="mb-3">
+        <label htmlFor="email" className="form-label">
+          Email
+        </label>
+        <input
+          id="email"
+          className="form-control"
+          type="email"
+          {...register("email", {
+            required: "El email es requerido",
+            pattern: {
+              value: /^\S+@\S+$/i,
+              message: "Email inválido",
+            },
+          })}
+        />
+        {errors.email && (
+          <div className="text-danger small">{errors.email.message}</div>
+        )}
+      </div>
+
+      <div className="mb-3">
+        <label htmlFor="direccion" className="form-label">
+          Dirección
+        </label>
+        <input
+          id="direccion"
+          className="form-control"
+          type="text"
+          {...register("direccion", { required: "La dirección es requerida" })}
+        />
+        {errors.direccion && (
+          <div className="text-danger small">{errors.direccion.message}</div>
+        )}
+      </div>
+
+      <div className="mb-3">
+        <label htmlFor="telefono" className="form-label">
+          Teléfono
+        </label>
+        <input
+          id="telefono"
+          className="form-control"
+          type="text"
+          {...register("telefono", { required: "El teléfono es requerido" })}
+        />
+        {errors.telefono && (
+          <div className="text-danger small">{errors.telefono.message}</div>
+        )}
+      </div>
+
+      <div className="mb-3">
+        <label htmlFor="password" className="form-label">
+          Nueva Contraseña (dejar vacío para no cambiar)
+        </label>
+        <input
+          id="password"
+          className="form-control"
+          type="password"
+          {...register("password", {
+            minLength: {
+              value: 8,
+              message: "La contraseña debe tener al menos 8 caracteres",
+            },
+          })}
+        />
+        {errors.password && (
+          <div className="text-danger small">{errors.password.message}</div>
+        )}
+      </div>
+
+      {/* Campo confirmar contraseña */}
+      <div className="mb-3">
+        <label htmlFor="confirmar_password" className="form-label">
+          Confirmar Nueva Contraseña
+        </label>
+        <input
+          id="confirmar_password"
+          className="form-control"
+          type="password"
+          {...register("confirmar_password", {
+            validate: (value) =>
+              !value ||
+              value === watch("password") ||
+              "Las contraseñas no coinciden",
+          })}
+        />
+        {errors.confirmar_password && (
+          <div className="text-danger small">
+            {errors.confirmar_password.message}
           </div>
         )}
+      </div>
 
-        <div className="d-grid">
-          <button type="submit" className="btn btn-primary">
-            Guardar Cambios
-          </button>
-        </div>
-      </form>
-    </div>
+      <div className="d-grid">
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={isSubmitting}
+        >
+          Guardar Cambios
+        </button>
+      </div>
+    </form>
   );
 }

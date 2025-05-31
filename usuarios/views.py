@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from .models import Usuarios, Roles
-from .serializer import UsuariosSerializer, RolesSerializer, UsuarioRegisterSerializer, CustomTokenObtainSerializer
+from .serializer import UsuariosSerializer, RolesSerializer, UsuarioRegisterSerializer, CustomTokenObtainSerializer, UsuarioPerfilSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -57,3 +57,26 @@ def obtener_jornada_doctor(request, doctor_id):
 
     except Exception as e:
         return Response({"error": str(e)}, status=500)  # Captura cualquier error inesperado
+
+@api_view(['GET', 'PUT', 'PATCH'])
+def perfil_paciente_por_id(request, usuario_id):
+    try:
+        usuario = Usuarios.objects.get(pk=usuario_id)
+    except Usuarios.DoesNotExist:
+        return Response({"error": "Usuario no encontrado"}, status=404)
+
+    if request.method == 'GET':
+        serializer = UsuarioPerfilSerializer(usuario)
+        return Response(serializer.data)
+
+    if request.method in ['PUT', 'PATCH']:
+        serializer = UsuarioPerfilSerializer(
+        usuario,
+        data=request.data,
+        partial=(request.method == 'PATCH'),
+        context={'usuario': usuario, 'request': request}  # paso usuario explícitamente
+    )
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Perfil actualizado correctamente"})
+        return Response(serializer.errors, status=400)
