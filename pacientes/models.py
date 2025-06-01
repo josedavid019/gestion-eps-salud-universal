@@ -9,13 +9,3 @@ class TipoAfiliacion(models.Model):
 
     def __str__(self):
         return self.nombre
-
-class HistorialesClinicos(models.Model):
-    historial_id = models.AutoField(primary_key=True)
-    resumen_general = models.CharField(max_length=255)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
-    usuario = models.ForeignKey('usuarios.Usuarios', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.historial_id

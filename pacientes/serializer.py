@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import TipoAfiliacion, HistorialesClinicos
+from .models import TipoAfiliacion
 
 class TipoAfiliacionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,15 +10,4 @@ class TipoAfiliacionSerializer(serializers.ModelSerializer):
             'descripcion',
             'fecha_creacion',
             'fecha_actualizacion'
-        ]
-
-class HistorialesClinicosSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = HistorialesClinicos
-        fields = [
-            'historial_id',
-            'resumen_general',
-            'fecha_creacion',
-            'fecha_actualizacion',
-            'usuario'
         ]
