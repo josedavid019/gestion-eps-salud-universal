@@ -30,7 +30,17 @@ export function Login() {
           color: "#fff",
         },
       });
-      navigate("/home");
+      // Verificar y redirigir según el rol
+      const roleName = response.data.role;
+      if (roleName === "paciente") {
+        navigate("/home");
+      } else if (roleName === "doctor") {
+        navigate("/doctor");
+      } else if (roleName === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/login");
+      }
     } catch (error) {
       const msg =
         error.response?.data?.detail ||

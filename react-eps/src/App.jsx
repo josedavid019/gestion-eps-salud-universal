@@ -15,9 +15,7 @@ import HistorialClinico from "./pages/HistorialClinico";
 import { Profile } from "./pages/Profile";
 
 // Doctores
-import DoctorHome from "./pages/DoctorHome";
-import RegistrarConsulta from "./pages/RegistrarConsulta";
-import BuscarPaciente from "./pages/BuscarPaciente";
+import { DoctorHome } from "./pages/DoctorHome";
 
 // Administradores
 import AdminHome from "./pages/AdminHome";
@@ -45,16 +43,8 @@ function App() {
 
         {/* Rutas protegidas para Doctores */}
         <Route element={<ProtectedRoutes allowedRoles={["doctor"]} />}>
-          <Route path="/doctor-home" element={<DoctorHome />} />
-          <Route
-            path="/doctor-home/registrar-consulta"
-            element={<RegistrarConsulta />}
-          />
-          <Route
-            path="/doctor-home/buscar-paciente"
-            element={<BuscarPaciente />}
-          />
-          <Route path="/doctor-home/profile" element={<Profile />} />
+          <Route path="/doctor" element={<DoctorHome />} />
+          <Route path="/doctor/profile" element={<Profile />} />
         </Route>
 
         {/* Rutas protegidas para Administradores */}

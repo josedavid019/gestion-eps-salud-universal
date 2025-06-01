@@ -17,7 +17,7 @@ export function Navbar() {
 
   const getHomePath = () => {
     if (role === "admin") return "/admin";
-    if (role === "doctor") return "/doctor-home";
+    if (role === "doctor") return "/doctor";
     if (role === "paciente") return "/home";
     return "/login";
   };
@@ -74,24 +74,8 @@ export function Navbar() {
                   {role === "doctor" && (
                     <>
                       <li className="nav-item">
-                        <Link className="nav-link text-white" to="/doctor-home">
+                        <Link className="nav-link text-white" to="/doctor">
                           Agenda del Día
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link text-white"
-                          to="/doctor-home/registrar-consulta"
-                        >
-                          Registrar Consulta
-                        </Link>
-                      </li>
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link text-white"
-                          to="/doctor-home/buscar-paciente"
-                        >
-                          Buscar Paciente
                         </Link>
                       </li>
                     </>

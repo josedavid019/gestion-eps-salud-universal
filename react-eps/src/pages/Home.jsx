@@ -23,7 +23,7 @@ export function Home() {
         const citasFuturas = res.data.filter((cita) => {
           const fechaHoy = new Date();
           const fechaCita = new Date(`${cita.fecha_cita}T${cita.hora_cita}`);
-          return fechaCita >= fechaHoy && cita.estado !== "cancelada";
+          return fechaCita >= fechaHoy && cita.estado !== "no_atendida";
         });
         setCitas(citasFuturas);
       } catch (error) {
@@ -46,8 +46,7 @@ export function Home() {
           {citas.length > 0 ? (
             citas.map((cita, idx) => (
               <li key={idx} className="list-group-item">
-                <strong>Fecha:</strong>{" "}
-                {new Date(cita.fecha_cita).toLocaleDateString("es-ES")} —{" "}
+                <strong>Fecha:</strong> {cita.fecha_cita} —{" "}
                 <strong>Hora:</strong> {cita.hora_cita} —{" "}
                 <strong>Doctor:</strong>{" "}
                 {cita.doctor

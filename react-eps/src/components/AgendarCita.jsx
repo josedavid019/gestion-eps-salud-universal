@@ -128,7 +128,7 @@ export function AgendarCita() {
       const cita = {
         ...data,
         usuario: user.usuario_id,
-        estado: "pendiente",
+        estado: "agendada",
         fecha_cita: data.fecha_cita.toISOString().split("T")[0],
       };
       await registrarCita(cita);

@@ -14,6 +14,13 @@ class ConsultasView(viewsets.ModelViewSet):
     serializer_class = ConsultasSerializer
     queryset = Consultas.objects.all()
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        cita_id = self.request.query_params.get('cita_id')
+        if cita_id:
+            queryset = queryset.filter(cita_id=cita_id)
+        return queryset
+
 @api_view(["GET"])
 def fechas_no_disponibles_doctor(request, doctor_id):
     citas = (
