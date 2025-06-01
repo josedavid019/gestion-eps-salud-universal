@@ -12,7 +12,6 @@ export function DoctorHome() {
   const [showModal, setShowModal] = useState(false);
   const [consultaExistente, setConsultaExistente] = useState(null);
 
-  // ✅ Ahora fetchCitas está fuera del useEffect
   const fetchCitas = async () => {
     if (!user) return;
 
@@ -38,7 +37,6 @@ export function DoctorHome() {
     }
   };
 
-  // ⏱️ Llama a fetchCitas al montar
   useEffect(() => {
     fetchCitas();
   }, [user]);
@@ -73,9 +71,9 @@ export function DoctorHome() {
     try {
       const res = await getConsultaPorCita(cita.cita_id);
       if (res.data.length > 0) {
-        setConsultaExistente(res.data[0]); // ✅ Aquí se guarda
+        setConsultaExistente(res.data[0]);
       } else {
-        setConsultaExistente(null); // No hay consulta aún
+        setConsultaExistente(null);
       }
     } catch (error) {
       console.error("Error buscando consulta:", error);
@@ -113,35 +111,44 @@ export function DoctorHome() {
             </tr>
           </thead>
           <tbody>
-            {appointments.map((a) => (
-              <tr
-                key={a.cita_id}
-                className={a.estado === "atendida" ? "table-success" : ""}
-              >
-                <td>{a.fecha_cita}</td>
-                <td>{a.hora_cita}</td>
-                <td>
-                  {a.usuario.primer_nombre} {a.usuario.primer_apellido}
-                </td>
-                <td>{a.usuario.identificacion}</td>
-                <td>{getEstadoLabel(a.estado)}</td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={() => handleVerClick(a)}
-                  >
-                    Ver
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {appointments.length === 0 && (
-              <tr>
-                <td colSpan="6" className="text-center text-muted">
-                  No hay citas programadas para hoy.
-                </td>
-              </tr>
-            )}
+            <>
+              {appointments.map((a) => (
+                <tr
+                  key={a.cita_id}
+                  className={
+                    a.estado === "atendida"
+                      ? "table-success"
+                      : a.estado === "no_atendida"
+                      ? "table-danger"
+                      : ""
+                  }
+                >
+                  <td>{a.fecha_cita}</td>
+                  <td>{a.hora_cita}</td>
+                  <td>
+                    {a.usuario.primer_nombre} {a.usuario.primer_apellido}
+                  </td>
+                  <td>{a.usuario.identificacion}</td>
+                  <td>{getEstadoLabel(a.estado)}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => handleVerClick(a)}
+                    >
+                      Ver
+                    </button>
+                  </td>
+                </tr>
+              ))}
+
+              {appointments.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center text-muted">
+                    No hay citas programadas para hoy.
+                  </td>
+                </tr>
+              )}
+            </>
           </tbody>
         </table>
       </div>

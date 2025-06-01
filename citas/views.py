@@ -62,3 +62,9 @@ def citas_por_paciente(request, usuario_id):
     citas = Citas.objects.filter(usuario_id=usuario_id).order_by('-fecha_cita', '-hora_cita')
     serializer = CitasSerializer(citas, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def consultas_por_paciente(request, usuario_id):
+    consultas = Consultas.objects.filter(cita__usuario_id=usuario_id).order_by('-fecha_atencion', '-fecha_creacion')
+    serializer = ConsultasSerializer(consultas, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

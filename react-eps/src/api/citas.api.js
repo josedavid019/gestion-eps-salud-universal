@@ -32,3 +32,6 @@ export const getConsultaPorCita = async (cita_id) =>
 
 export const actualizarConsulta = async (consulta_id, consulta) =>
   citasApi.patch(`consultas/${consulta_id}/`, consulta);
+
+export const getConsultasPorPaciente = async (usuario_id) =>
+  citasApi.get(`consultas/paciente/${usuario_id}/`);

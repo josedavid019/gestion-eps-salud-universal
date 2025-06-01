@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Tab, Nav, Button, Form } from "react-bootstrap";
+import { Modal, Tab, Nav, Button, Form, Accordion } from "react-bootstrap";
 import { format } from "date-fns";
 import {
   registrarConsulta,
   actualizarCita,
   actualizarConsulta,
+  getConsultasPorPaciente,
 } from "../api/citas.api";
 
 export function ModalCita({
@@ -21,6 +22,8 @@ export function ModalCita({
   const [sintomas, setSintomas] = useState("");
   const [tratamiento, setTratamiento] = useState("");
   const [recomendaciones, setRecomendaciones] = useState("");
+  const [historialConsultas, setHistorialConsultas] = useState([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(false);
   const fechaAtencion = format(new Date(), "yyyy-MM-dd");
 
   // Actualizar solo el estado de la cita
@@ -72,6 +75,25 @@ export function ModalCita({
   };
 
   useEffect(() => {
+    const cargarHistorial = async () => {
+      if (cita?.usuario?.usuario_id) {
+        setCargandoHistorial(true);
+        try {
+          const response = await getConsultasPorPaciente(
+            cita.usuario.usuario_id
+          );
+          setHistorialConsultas(response.data);
+        } catch (error) {
+          console.error("Error al cargar historial:", error);
+          setHistorialConsultas([]);
+        } finally {
+          setCargandoHistorial(false);
+        }
+      }
+    };
+
+    cargarHistorial();
+
     if (consultaExistente) {
       setSintomas(consultaExistente.sintomas || "");
       setTratamiento(consultaExistente.tratamiento || "");
@@ -171,7 +193,36 @@ export function ModalCita({
             </Tab.Pane>
             <Tab.Pane eventKey="historial">
               <h5>Historial del Paciente</h5>
-              <p>Aquí va la información del historial clínico del paciente.</p>
+              {cargandoHistorial ? (
+                <p>Cargando historial...</p>
+              ) : historialConsultas.length === 0 ? (
+                <p>No hay consultas registradas para este paciente.</p>
+              ) : (
+                <Accordion alwaysOpen>
+                  {historialConsultas.map((consulta, index) => (
+                    <Accordion.Item
+                      eventKey={String(index)}
+                      key={consulta.consulta_id}
+                    >
+                      <Accordion.Header>
+                        Consulta del {consulta.fecha_atencion}
+                      </Accordion.Header>
+                      <Accordion.Body>
+                        <p>
+                          <strong>Síntomas:</strong> {consulta.sintomas}
+                        </p>
+                        <p>
+                          <strong>Tratamiento:</strong> {consulta.tratamiento}
+                        </p>
+                        <p>
+                          <strong>Recomendaciones:</strong>{" "}
+                          {consulta.recomendaciones}
+                        </p>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  ))}
+                </Accordion>
+              )}
             </Tab.Pane>
           </Tab.Content>
         </Tab.Container>
