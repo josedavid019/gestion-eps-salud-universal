@@ -93,3 +93,9 @@ def obtener_doctor_por_unidad(request, unidad_id):
             return Response({"detail": "La unidad no tiene un doctor asignado."}, status=status.HTTP_404_NOT_FOUND)
     except UnidadesMedicas.DoesNotExist:
         return Response({"detail": "Unidad médica no encontrada."}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def listar_pacientes(request):
+    pacientes = Usuarios.objects.filter(role__nombre__iexact='paciente')
+    serializer = UsuariosSerializer(pacientes, many=True)
+    return Response(serializer.data)

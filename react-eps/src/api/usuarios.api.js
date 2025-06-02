@@ -18,3 +18,11 @@ export const getJornadaDoctor = async (doctorId) =>
 
 export const getDoctorPorUnidad = async (unidadId) =>
   usuariosApi.get(`unidades/${unidadId}/doctor/`);
+
+export const getPacientes = async () => usuariosApi.get("pacientes/");
+
+export const actualizarPaciente = async (usuario_id, paciente) =>
+  usuariosApi.put(`perfil/${usuario_id}/`, paciente);
+
+export const eliminarPaciente = async (usuario_id) =>
+  usuariosApi.delete(`usuarios/${usuario_id}/`);

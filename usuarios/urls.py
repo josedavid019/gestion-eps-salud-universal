@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import UsuariosView, RolesView, UsuarioRegisterView, CustomLoginView, doctores_por_unidad, obtener_jornada_doctor, perfil_paciente_por_id, obtener_doctor_por_unidad
+from .views import UsuariosView, RolesView, UsuarioRegisterView, CustomLoginView, doctores_por_unidad, obtener_jornada_doctor, perfil_paciente_por_id, obtener_doctor_por_unidad, listar_pacientes
 
 router = routers.DefaultRouter()
 router.register(r'usuarios', UsuariosView, 'usuarios')
@@ -14,4 +14,5 @@ urlpatterns = [
     path('api/doctores/<int:doctor_id>/jornada/', obtener_jornada_doctor, name='obtener-jornada-doctor'),
     path('api/perfil/<int:usuario_id>/', perfil_paciente_por_id, name='perfil-paciente-id'),
     path('api/unidades/<int:unidad_id>/doctor/', obtener_doctor_por_unidad, name='doctor-por-unidad'),
+    path('api/pacientes/', listar_pacientes, name='listar-pacientes'),
 ]
