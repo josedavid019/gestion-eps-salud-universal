@@ -1,111 +1,193 @@
-// src/pages/GestionarUnidades.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import UnidadForm from "../components/UnidadForm";
+import {
+  getUnidades,
+  getUnidadesConDoctores,
+  actualizarUnidad,
+  eliminarUnidad,
+  agregarUnidad,
+} from "../api/unidades.api";
 
 export default function GestionarUnidades() {
   const [unidades, setUnidades] = useState([]);
   const [doctores, setDoctores] = useState([]);
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [validated, setValidated] = useState(false);
-  const [form, setForm] = useState({ id: '', nombre: '', planta: '', doctorResponsable: '' });
+
+  const [form, setForm] = useState({
+    nombre: "",
+    descripcion: "",
+    planta: "",
+    doctor: "",
+    activo: true,
+  });
 
   useEffect(() => {
-    // Datos simulados
-    setUnidades([
-      { id: 'U1', nombre: 'Pediatría', planta: 1, doctorResponsable: 'D1' },
-      { id: 'U2', nombre: 'Fractura', planta: 2, doctorResponsable: 'D2' }
-    ]);
-    setDoctores([
-      { id: 'D1', nombre: 'Juan Pérez' },
-      { id: 'D2', nombre: 'María Gómez' }
-    ]);
+    cargarUnidades();
+    cargarDoctores();
   }, []);
 
-  const openModal = unidad => {
+  const cargarUnidades = async () => {
+    try {
+      const res = await getUnidades();
+      setUnidades(res.data);
+    } catch (error) {
+      console.error("Error al cargar unidades:", error);
+    }
+  };
+
+  const cargarDoctores = async () => {
+    try {
+      const res = await getUnidadesConDoctores();
+      // Pasamos el arreglo tal cual porque ya tiene los campos correctos
+      setDoctores(res.data);
+    } catch (error) {
+      console.error("Error al cargar doctores:", error);
+    }
+  };
+
+  const openModal = (unidad = null) => {
     setValidated(false);
     if (unidad) {
-      setEditing(unidad.id);
+      setEditing(unidad.unidad_id);
       setForm({ ...unidad });
     } else {
       setEditing(null);
-      setForm({ id: '', nombre: '', planta: '', doctorResponsable: '' });
+      setForm({
+        nombre: "",
+        descripcion: "",
+        planta: "",
+        doctor: "",
+        activo: true,
+      });
     }
     setModalOpen(true);
   };
 
-  const closeModal = () => setModalOpen(false);
-
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditing(null);
   };
 
-  const handleSubmit = e => {
-    const formEl = e.currentTarget;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "activo" ? value === "true" || value === true : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const formEl = e.currentTarget;
+
     if (!formEl.checkValidity()) {
       e.stopPropagation();
       setValidated(true);
       return;
     }
-    const nuevaUnidad = { ...form, planta: Number(form.planta) };
-    if (editing) {
-      setUnidades(prev => prev.map(u => u.id === editing ? nuevaUnidad : u));
-    } else {
-      setUnidades(prev => [...prev, nuevaUnidad]);
+
+    try {
+      if (editing) {
+        // Actualizar unidad existente
+        await actualizarUnidad(editing, form);
+      } else {
+        // Crear nueva unidad
+        await agregarUnidad(form);
+      }
+
+      await cargarUnidades(); // Recargar unidades después de guardar
+      closeModal();
+    } catch (error) {
+      console.error("Error al guardar la unidad:", error);
     }
-    closeModal();
   };
 
-  const handleDelete = id => {
-    if (window.confirm('¿Eliminar unidad?')) {
-      setUnidades(prev => prev.filter(u => u.id !== id));
+  const handleDelete = async (id) => {
+    if (window.confirm("¿Eliminar unidad?")) {
+      try {
+        await eliminarUnidad(id);
+        await cargarUnidades(); // recarga lista actualizada
+        closeModal();
+      } catch (error) {
+        console.error("Error al eliminar unidad:", error);
+      }
     }
   };
 
-  const filtered = unidades.filter(u =>
-    u.nombre.toLowerCase().includes(filter.toLowerCase()) ||
-    u.id.toLowerCase().includes(filter.toLowerCase())
+  const filtered = unidades.filter(
+    (u) =>
+      u.nombre.toLowerCase().includes(filter.toLowerCase()) ||
+      String(u.unidad_id).includes(filter.toLowerCase())
   );
 
   return (
     <div className="container my-4">
       <h2 className="mb-4">Gestionar Unidades</h2>
       <div className="d-flex mb-3 align-items-center">
-        <button className="btn btn-success me-3" onClick={() => openModal(null)}>Nueva Unidad</button>
+        <button className="btn btn-success me-3" onClick={() => openModal()}>
+          Nueva Unidad
+        </button>
         <input
           type="text"
           className="form-control w-25"
           placeholder="Filtrar unidades..."
           value={filter}
-          onChange={e => setFilter(e.target.value)}
+          onChange={(e) => setFilter(e.target.value)}
         />
       </div>
       <div className="table-responsive">
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Nombre</th>
               <th>Planta</th>
               <th>Doctor Responsable</th>
+              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map(u => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
+            {filtered.map((u) => (
+              <tr key={u.unidad_id}>
                 <td>{u.nombre}</td>
                 <td>{u.planta}</td>
-                <td>{doctores.find(d => d.id === u.doctorResponsable)?.nombre || u.doctorResponsable}</td>
                 <td>
-                  <button className="btn btn-sm btn-primary me-2" onClick={() => openModal(u)}>Editar</button>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(u.id)}>Eliminar</button>
+                  {(() => {
+                    const doc = doctores.find((d) => d.usuario_id === u.doctor);
+                    return doc
+                      ? `${doc.primer_nombre} ${doc.primer_apellido} - ${doc.especialidad}`
+                      : "Sin asignar";
+                  })()}
+                </td>
+                <td>
+                  <span
+                    className={`badge ${
+                      u.activo ? "bg-success" : "bg-secondary"
+                    }`}
+                  >
+                    {u.activo ? "Activa" : "Inactiva"}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => openModal(u)}
+                  >
+                    Ver
+                  </button>
                 </td>
               </tr>
             ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan="5" className="text-center">
+                  No se encontraron unidades.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -115,54 +197,25 @@ export default function GestionarUnidades() {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{editing ? 'Editar Unidad' : 'Nueva Unidad'}</h5>
-                <button type="button" className="btn-close" onClick={closeModal}></button>
+                <h5 className="modal-title">
+                  {editing ? "Editar Unidad" : "Nueva Unidad"}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={closeModal}
+                ></button>
               </div>
-              <form noValidate className={validated ? 'was-validated' : ''} onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  {[
-                    { name: 'id', label: 'ID', type: 'text', pattern: 'U\\d+' },
-                    { name: 'nombre', label: 'Nombre', type: 'text' },
-                    { name: 'planta', label: 'Planta', type: 'number', min: 1 }
-                  ].map(f => (
-                    <div className="mb-3" key={f.name}>
-                      <label htmlFor={f.name} className="form-label">{f.label}</label>
-                      <input
-                        id={f.name}
-                        type={f.type}
-                        className="form-control"
-                        name={f.name}
-                        value={form[f.name]}
-                        onChange={handleChange}
-                        required
-                        {...(f.pattern && { pattern: f.pattern })}
-                        {...(f.min && { min: f.min })}
-                      />
-                      <div className="invalid-feedback">Por favor ingresa un valor válido en {f.label}.</div>
-                    </div>
-                  ))}
-                  <div className="mb-3">
-                    <label className="form-label">Doctor Responsable</label>
-                    <select
-                      className="form-select"
-                      name="doctorResponsable"
-                      value={form.doctorResponsable}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Selecciona un doctor</option>
-                      {doctores.map(d => (
-                        <option key={d.id} value={d.id}>{d.nombre}</option>
-                      ))}
-                    </select>
-                    <div className="invalid-feedback">Selecciona un doctor responsable.</div>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">Guardar</button>
-                </div>
-              </form>
+
+              <UnidadForm
+                form={form}
+                doctores={doctores}
+                validated={validated}
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+                onCancel={closeModal}
+                onDelete={editing ? () => handleDelete(editing) : null}
+              />
             </div>
           </div>
         </div>

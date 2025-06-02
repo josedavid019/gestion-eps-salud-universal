@@ -19,7 +19,13 @@ class RolesSerializer(serializers.ModelSerializer):
             'fecha_actualizacion'
         ]
 
+class UnidadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UnidadesMedicas
+        fields = ['unidad_id', 'nombre', 'descripcion', 'planta']
+
 class UsuariosSerializer(serializers.ModelSerializer):
+    unidad = UnidadSerializer(read_only=True)
     class Meta:
         model = Usuarios
         fields = [

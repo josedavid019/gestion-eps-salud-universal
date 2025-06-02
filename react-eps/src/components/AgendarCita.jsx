@@ -3,8 +3,8 @@ import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
-import { getDoctoresPorUnidad, getJornadaDoctor } from "../api/usuarios.api";
-import { getUnidadesConDoctores } from "../api/unidades.api";
+import { getDoctorPorUnidad, getJornadaDoctor } from "../api/usuarios.api";
+import { getUnidadesConDoctor } from "../api/unidades.api";
 import {
   registrarCita,
   getFechasNoDisponibles,
@@ -12,7 +12,7 @@ import {
 } from "../api/citas.api";
 import DatePicker from "react-datepicker";
 import { registerLocale } from "react-datepicker";
-import es from "date-fns/locale/es"; // idioma español
+import es from "date-fns/locale/es";
 registerLocale("es", es);
 
 export function AgendarCita() {
@@ -28,51 +28,45 @@ export function AgendarCita() {
     control,
   } = useForm();
   const [unidades, setUnidades] = useState([]);
-  const [doctores, setDoctores] = useState([]);
   const [fechasNoDisponibles, setFechasNoDisponibles] = useState([]);
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
-  const [horasDisponibles, setHorasDisponibles] = useState([]);
-  const [jornada, setJornada] = useState(""); // "matinal" o "vespertina"
   const [horasOcupadas, setHorasOcupadas] = useState([]);
+  const [jornada, setJornada] = useState("");
+  const [doctorAsignado, setDoctorAsignado] = useState(null);
 
-  const handleDoctorChange = async (e) => {
-    const doctorId = e.target.value;
-    setValue("doctor", doctorId);
+  const handleUnidadChange = async (e) => {
+    const unidadSeleccionada = e.target.value;
+    setValue("unidad", unidadSeleccionada);
     setValue("fecha_cita", null);
     setHorasOcupadas([]);
     setJornada("");
 
-    if (!doctorId) return;
-
     try {
-      const res = await getJornadaDoctor(doctorId);
-      setJornada(res.data.jornada ? res.data.jornada.toLowerCase() : "");
+      const response = await getDoctorPorUnidad(unidadSeleccionada);
+      const doctor = response.data;
+      setDoctorAsignado(doctor);
 
-      if (!res.data.jornada) {
-        toast.error("Este doctor no tiene jornada asignada.");
+      if (doctor?.usuario_id) {
+        setValue("doctor", doctor.usuario_id); // Asignar automáticamente
+        const res = await getJornadaDoctor(doctor.usuario_id);
+        setJornada(res.data.jornada ? res.data.jornada.toLowerCase() : "");
+
+        if (!res.data.jornada) {
+          toast.error("Este doctor no tiene jornada asignada.");
+        }
       }
-    } catch (err) {
-      console.error("Error al obtener jornada:", err);
-      toast.error("Error al obtener jornada del doctor");
-    }
-  };
-
-  const handleUnidadChange = async (e) => {
-    const unidadId = e.target.value;
-    setValue("unidad", unidadId); // setear unidad manualmente
-    try {
-      const res = await getDoctoresPorUnidad(unidadId);
-      setDoctores(res.data);
     } catch (error) {
-      toast.error("Error al cargar doctores de esta unidad");
-      setDoctores([]);
+      console.error("No se encontró doctor para esta unidad:", error);
+      setDoctorAsignado(null);
+      setValue("doctor", null);
+      setJornada("");
+      toast.error("No hay doctor asignado a esta unidad médica.");
     }
   };
 
   const generarHoras = () => {
     const horas = [];
-    const inicio = jornada === "matinal" ? 7 : 13; // 07:00 o 13:00
-    const fin = inicio + 5; // 5 horas después
+    const inicio = jornada === "matinal" ? 7 : 13;
+    const fin = inicio + 5;
 
     for (let h = inicio; h < fin; h++) {
       horas.push(`${h.toString().padStart(2, "0")}:00`);
@@ -85,14 +79,14 @@ export function AgendarCita() {
   useEffect(() => {
     async function fetchUnidades() {
       try {
-        const res = await getUnidadesConDoctores();
+        const res = await getUnidadesConDoctor();
         setUnidades(res.data);
       } catch (err) {
         toast.error("Error al cargar unidades médicas");
       }
     }
 
-    const cargarFechasNoDisponibles = async () => {
+    async function cargarFechasNoDisponibles() {
       if (!watch("doctor")) return;
 
       try {
@@ -102,7 +96,7 @@ export function AgendarCita() {
         console.error("Error al obtener fechas no disponibles", err);
         setFechasNoDisponibles([]);
       }
-    };
+    }
 
     async function fetchHorasOcupadas() {
       if (!watch("doctor") || !watch("fecha_cita")) return;
@@ -112,7 +106,7 @@ export function AgendarCita() {
           watch("doctor"),
           watch("fecha_cita")
         );
-        setHorasOcupadas(res.data); // formato: ["08:00", "08:30", ...]
+        setHorasOcupadas(res.data);
       } catch (err) {
         toast.error("Error al obtener horas ocupadas");
       }
@@ -188,32 +182,20 @@ export function AgendarCita() {
           </select>
         </div>
 
-        {/* Doctor */}
-        {doctores.length > 0 && (
+        {/* Doctor asignado (texto informativo) */}
+        {doctorAsignado && (
           <div className="mb-3">
-            <label htmlFor="doctor" className="form-label">
-              Doctor
-            </label>
-            <select
-              className="form-select"
-              id="doctor"
-              {...register("doctor", { required: "Seleccione un doctor" })}
-              onChange={handleDoctorChange}
-            >
-              <option value="">Seleccione un doctor...</option>
-              {doctores.map((d) => (
-                <option key={d.usuario_id} value={d.usuario_id}>
-                  Dr. {d.primer_nombre} {d.primer_apellido} ({d.especialidad})
-                </option>
-              ))}
-            </select>
-            {errors.doctor && (
-              <span className="text-danger small">{errors.doctor.message}</span>
-            )}
+            <label className="form-label">Doctor asignado</label>
+            <input
+              type="text"
+              className="form-control"
+              value={`Dr. ${doctorAsignado.primer_nombre} ${doctorAsignado.primer_apellido} (${doctorAsignado.especialidad})`}
+              disabled
+            />
           </div>
         )}
 
-        {/* Campos que solo se muestran si se eligió unidad y doctor */}
+        {/* Campos que solo se muestran si hay unidad y doctor asignado */}
         {watch("unidad") && watch("doctor") && (
           <>
             {/* Fecha */}

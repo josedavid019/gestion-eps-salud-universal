@@ -15,3 +15,6 @@ export const getDoctoresPorUnidad = async (unidadId) =>
 
 export const getJornadaDoctor = async (doctorId) =>
   usuariosApi.get(`doctores/${doctorId}/jornada/`);
+
+export const getDoctorPorUnidad = async (unidadId) =>
+  usuariosApi.get(`unidades/${unidadId}/doctor/`);

@@ -4,6 +4,7 @@ from .serializer import UsuariosSerializer, RolesSerializer, UsuarioRegisterSeri
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from unidades.models import UnidadesMedicas
 
 class RolesView(viewsets.ModelViewSet):
     serializer_class = RolesSerializer
@@ -80,3 +81,15 @@ def perfil_paciente_por_id(request, usuario_id):
             serializer.save()
             return Response({"message": "Perfil actualizado correctamente"})
         return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+def obtener_doctor_por_unidad(request, unidad_id):
+    try:
+        unidad = UnidadesMedicas.objects.get(pk=unidad_id)
+        if unidad.doctor:
+            serializer = UsuariosSerializer(unidad.doctor)
+            return Response(serializer.data)
+        else:
+            return Response({"detail": "La unidad no tiene un doctor asignado."}, status=status.HTTP_404_NOT_FOUND)
+    except UnidadesMedicas.DoesNotExist:
+        return Response({"detail": "Unidad médica no encontrada."}, status=status.HTTP_404_NOT_FOUND)
