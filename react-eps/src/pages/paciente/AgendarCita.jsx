@@ -168,6 +168,34 @@ export function AgendarCita() {
     }
   };
 
+  const isDiaValido = (date) => {
+    const hoy = new Date();
+    const fechaSeleccionada = new Date(date);
+
+    const esMismoDia = hoy.toDateString() === fechaSeleccionada.toDateString();
+
+    const horaActual = hoy.getHours();
+
+    // Si es jornada matinal y ya pasó el mediodía, no puede agendar para hoy
+    if (jornada === "matinal") {
+      if (horaActual < 12) {
+        // Puede agendar hoy por la tarde (la jornada ya lo validará en horas)
+        return true;
+      } else {
+        // Solo puede agendar para mañana en adelante
+        return !esMismoDia;
+      }
+    }
+
+    // Si es jornada vespertina, solo puede agendar desde mañana
+    if (jornada === "vespertina") {
+      return !esMismoDia;
+    }
+
+    // Por defecto, permitir
+    return true;
+  };
+
   return (
     <div className="container mt-4" style={{ maxWidth: "600px" }}>
       <h2 className="text-center mb-4">Agendar Cita</h2>
@@ -259,6 +287,7 @@ export function AgendarCita() {
                       dateFormat="yyyy-MM-dd"
                       minDate={new Date()}
                       excludeDates={fechasNoDisponibles.map((f) => new Date(f))}
+                      filterDate={isDiaValido}
                     />
                   )}
                 />
