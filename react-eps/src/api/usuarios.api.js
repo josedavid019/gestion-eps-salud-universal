@@ -26,3 +26,11 @@ export const actualizarPaciente = async (usuario_id, paciente) =>
 
 export const eliminarPaciente = async (usuario_id) =>
   usuariosApi.delete(`usuarios/${usuario_id}/`);
+
+export const getDoctores = async () => usuariosApi.get("listar-doctores/");
+
+export const actualizarDoctor = async (doctor_id, doctor) =>
+  usuariosApi.put(`doctores/${doctor_id}/`, doctor);
+
+export const eliminarDoctor = async (doctor_id) =>
+  usuariosApi.delete(`usuarios/${doctor_id}/`);

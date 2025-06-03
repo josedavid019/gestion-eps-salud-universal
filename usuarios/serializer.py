@@ -176,3 +176,30 @@ class UsuarioPerfilSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+class DoctorUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuarios
+        fields = [
+            'primer_nombre',
+            'segundo_nombre',
+            'primer_apellido',
+            'segundo_apellido',
+            'genero',
+            'fecha_nacimiento',
+            'email',
+            'direccion',
+            'telefono',
+            'especialidad',
+            'fecha_ingreso',
+            'activo',
+            'role',
+            'afiliacion',
+            'jornada',
+        ]
+
+    def validate_email(self, value):
+        usuario = self.instance
+        if Usuarios.objects.filter(email=value).exclude(pk=usuario.pk).exists():
+            raise serializers.ValidationError("Este email ya está en uso por otro usuario.")
+        return value

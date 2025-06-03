@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from .models import Usuarios, Roles
-from .serializer import UsuariosSerializer, RolesSerializer, UsuarioRegisterSerializer, CustomTokenObtainSerializer, UsuarioPerfilSerializer
+from .serializer import UsuariosSerializer, RolesSerializer, UsuarioRegisterSerializer, CustomTokenObtainSerializer, UsuarioPerfilSerializer, DoctorUpdateSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -99,3 +99,27 @@ def listar_pacientes(request):
     pacientes = Usuarios.objects.filter(role__nombre__iexact='paciente')
     serializer = UsuariosSerializer(pacientes, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def listar_doctores(request):
+    doctores = Usuarios.objects.filter(role__nombre__iexact='doctor')
+    serializer = UsuariosSerializer(doctores, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET', 'PUT', 'PATCH'])
+def actualizar_doctor_por_id(request, doctor_id):
+    try:
+        doctor = Usuarios.objects.get(pk=doctor_id, role__nombre__iexact='doctor')
+    except Usuarios.DoesNotExist:
+        return Response({"error": "Doctor no encontrado"}, status=404)
+
+    if request.method == 'GET':
+        serializer = DoctorUpdateSerializer(doctor)
+        return Response(serializer.data)
+
+    if request.method in ['PUT', 'PATCH']:
+        serializer = DoctorUpdateSerializer(doctor, data=request.data, partial=(request.method == 'PATCH'))
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Doctor actualizado correctamente"})
+        return Response(serializer.errors, status=400)
