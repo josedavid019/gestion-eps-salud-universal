@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { getCitasPorPaciente } from "../api/citas.api";
+import { useAuth } from "../../context/AuthContext";
+import { getCitasPorPaciente } from "../../api/citas.api";
 
 export function MisCitas() {
   const { user } = useAuth();

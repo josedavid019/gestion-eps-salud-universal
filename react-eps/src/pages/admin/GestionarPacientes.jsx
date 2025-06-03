@@ -4,8 +4,8 @@ import {
   actualizarPaciente,
   registrarUsuario,
   eliminarPaciente,
-} from "../api/usuarios.api";
-import { getAfiliaciones } from "../api/pacientes.api";
+} from "../../api/usuarios.api";
+import { getAfiliaciones } from "../../api/pacientes.api";
 
 // Función para calcular edad a partir de fecha de nacimiento YYYY-MM-DD
 function calcularEdad(fechaNacimiento) {
@@ -20,7 +20,7 @@ function calcularEdad(fechaNacimiento) {
   return edad;
 }
 
-export default function GestionarPacientes() {
+export function GestionarPacientes() {
   const [pacientes, setPacientes] = useState([]);
   const [afiliaciones, setAfiliaciones] = useState([]);
   const [filter, setFilter] = useState("");

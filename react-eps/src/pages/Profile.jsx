@@ -9,6 +9,7 @@ export function Profile() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const userId = user?.id || user?.usuario_id;
+  const userRole = user?.role;
 
   const {
     watch,
@@ -61,7 +62,15 @@ export function Profile() {
         updatedData
       );
       toast.success("Perfil actualizado correctamente");
-      navigate("/home");
+      if (userRole === "paciente") {
+        navigate("/home");
+      } else if (userRole === "doctor") {
+        navigate("/doctor");
+      } else if (userRole === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/login");
+      }
     } catch (error) {
       toast.error("Error al actualizar el perfil");
     }

@@ -6,9 +6,9 @@ import {
   actualizarDoctor,
   registrarUsuario,
   eliminarDoctor,
-} from "../api/usuarios.api";
+} from "../../api/usuarios.api";
 
-export default function GestionarDoctores() {
+export function GestionarDoctores() {
   const [doctores, setDoctores] = useState([]);
   const [filter, setFilter] = useState("");
   const [modalOpen, setModalOpen] = useState(false);

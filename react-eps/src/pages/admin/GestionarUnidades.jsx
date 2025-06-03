@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import UnidadForm from "../components/UnidadForm";
+import UnidadForm from "../../components/UnidadForm";
 import {
   getUnidades,
   getUnidadesConDoctores,
   actualizarUnidad,
   eliminarUnidad,
   agregarUnidad,
-} from "../api/unidades.api";
+} from "../../api/unidades.api";
 
-export default function GestionarUnidades() {
+export function GestionarUnidades() {
   const [unidades, setUnidades] = useState([]);
   const [doctores, setDoctores] = useState([]);
   const [filter, setFilter] = useState("");

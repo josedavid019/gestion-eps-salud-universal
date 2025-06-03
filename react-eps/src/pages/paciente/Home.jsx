@@ -1,7 +1,7 @@
 // src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { getCitasPorPaciente } from "../api/citas.api";
+import { useAuth } from "../../context/AuthContext";
+import { getCitasPorPaciente } from "../../api/citas.api";
 import { toast } from "react-hot-toast";
 
 export function Home() {
@@ -23,7 +23,7 @@ export function Home() {
         const citasFuturas = res.data.filter((cita) => {
           const fechaHoy = new Date();
           const fechaCita = new Date(`${cita.fecha_cita}T${cita.hora_cita}`);
-          return fechaCita >= fechaHoy && cita.estado !== "no_atendida";
+          return fechaCita >= fechaHoy && cita.estado === "agendada";
         });
         setCitas(citasFuturas);
       } catch (error) {

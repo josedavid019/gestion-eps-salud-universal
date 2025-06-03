@@ -4,24 +4,23 @@ import { Toaster } from "react-hot-toast";
 
 import { Login } from "./pages/Login";
 import { Registrar } from "./pages/Registrar";
-import { Navbar } from "./components/Navbar"; // Asegúrate de importar el Navbar
-import ProtectedRoutes from "./routes/ProtectedRoutes";
+import { Navbar } from "./components/Navbar";
+import { Profile } from "./pages/Profile";
+import { ProtectedRoute } from "./routes/ProtectedRoutes";
 
 // Pacientes
-import { Home } from "./pages/Home";
-import { AgendarCita } from "./components/AgendarCita";
-import { MisCitas } from "./pages/MisCitas";
-import HistorialClinico from "./pages/HistorialClinico";
-import { Profile } from "./pages/Profile";
+import { Home } from "./pages/paciente/Home";
+import { AgendarCita } from "./pages/paciente/AgendarCita";
+import { MisCitas } from "./pages/paciente/MisCitas";
 
 // Doctores
-import { DoctorHome } from "./pages/DoctorHome";
+import { DoctorHome } from "./pages/doctor/DoctorHome";
 
 // Administradores
-import AdminHome from "./pages/AdminHome";
-import GestionarPacientes from "./pages/GestionarPacientes";
-import GestionarDoctores from "./pages/GestionarDoctores";
-import GestionarUnidades from "./pages/GestionarUnidades";
+import { AdminHome } from "./pages/admin/AdminHome";
+import { GestionarPacientes } from "./pages/admin/GestionarPacientes";
+import { GestionarDoctores } from "./pages/admin/GestionarDoctores";
+import { GestionarUnidades } from "./pages/admin/GestionarUnidades";
 
 function App() {
   return (
@@ -34,7 +33,7 @@ function App() {
         <Route path="/registrar" element={<Registrar />} />
 
         {/* Rutas protegidas para Pacientes */}
-        <Route element={<ProtectedRoutes allowedRoles={["paciente"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["paciente"]} />}>
           <Route path="/home" element={<Home />} />
           <Route path="/home/agendar" element={<AgendarCita />} />
           <Route path="/home/mis-citas" element={<MisCitas />} />
@@ -42,13 +41,13 @@ function App() {
         </Route>
 
         {/* Rutas protegidas para Doctores */}
-        <Route element={<ProtectedRoutes allowedRoles={["doctor"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["doctor"]} />}>
           <Route path="/doctor" element={<DoctorHome />} />
           <Route path="/doctor/profile" element={<Profile />} />
         </Route>
 
         {/* Rutas protegidas para Administradores */}
-        <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route path="/admin" element={<AdminHome />} />
           <Route path="/admin/pacientes" element={<GestionarPacientes />} />
           <Route path="/admin/doctores" element={<GestionarDoctores />} />

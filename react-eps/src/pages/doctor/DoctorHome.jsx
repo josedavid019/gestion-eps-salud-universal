@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { getCitas, getConsultaPorCita } from "../api/citas.api";
-import { useAuth } from "../context/AuthContext";
-import { ModalCita } from "../components/ModalCita";
+import { getCitas, getConsultaPorCita } from "../../api/citas.api";
+import { useAuth } from "../../context/AuthContext";
+import { ModalCita } from "../../components/ModalCita";
 
 export function DoctorHome() {
   const [appointments, setAppointments] = useState([]);
