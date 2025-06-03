@@ -6,6 +6,8 @@ const citasApi = axios.create({
 
 export const getCitas = async () => citasApi.get("citas/");
 
+export const getConsultas = async () => citasApi.get("consultas/");
+
 export const registrarCita = async (cita) => citasApi.post("citas/", cita);
 
 export const getFechasNoDisponibles = async (doctorId) =>
