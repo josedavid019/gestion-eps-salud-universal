@@ -29,9 +29,9 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div className="container-fluid px-2">
-          <Link className="navbar-brand text-white" to={homePath}>
+      <nav className="navbar navbar-expand-lg bg-primary shadow-sm border-bottom sticky-top">
+        <div className="container-fluid px-3">
+          <Link className="navbar-brand text-white fw-bold" to={homePath}>
             EPS Salud Universal
           </Link>
 
@@ -48,8 +48,10 @@ export function Navbar() {
               >
                 <span className="navbar-toggler-icon" />
               </button>
+
               <div className="collapse navbar-collapse" id="navbarNav">
-                <ul className="navbar-nav ms-auto">
+                <ul className="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                  {/* NAV PACIENTE */}
                   {role === "paciente" && (
                     <>
                       <li className="nav-item">
@@ -71,16 +73,16 @@ export function Navbar() {
                     </>
                   )}
 
+                  {/* NAV DOCTOR */}
                   {role === "doctor" && (
-                    <>
-                      <li className="nav-item">
-                        <Link className="nav-link text-white" to="/doctor">
-                          Agenda del Día
-                        </Link>
-                      </li>
-                    </>
+                    <li className="nav-item">
+                      <Link className="nav-link text-white" to="/doctor">
+                        Agenda del Día
+                      </Link>
+                    </li>
                   )}
 
+                  {/* NAV ADMIN */}
                   {role === "admin" && (
                     <>
                       <li className="nav-item">
@@ -88,7 +90,7 @@ export function Navbar() {
                           className="nav-link text-white"
                           to="/admin/pacientes"
                         >
-                          Gestionar Pacientes
+                          Pacientes
                         </Link>
                       </li>
                       <li className="nav-item">
@@ -96,7 +98,7 @@ export function Navbar() {
                           className="nav-link text-white"
                           to="/admin/doctores"
                         >
-                          Gestionar Doctores
+                          Doctores
                         </Link>
                       </li>
                       <li className="nav-item">
@@ -104,12 +106,13 @@ export function Navbar() {
                           className="nav-link text-white"
                           to="/admin/unidades"
                         >
-                          Gestionar Unidades
+                          Unidades
                         </Link>
                       </li>
                     </>
                   )}
 
+                  {/* PERFIL */}
                   <li className="nav-item">
                     <Link
                       className="nav-link text-white"
@@ -119,9 +122,10 @@ export function Navbar() {
                     </Link>
                   </li>
 
+                  {/* CERRAR SESIÓN */}
                   <li className="nav-item">
                     <button
-                      className="nav-link btn btn-link text-white"
+                      className="btn btn-outline-light ms-lg-2"
                       onClick={handleLogout}
                     >
                       Cerrar Sesión
@@ -134,9 +138,8 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Solo muestra el contenido si NO es login/registro */}
       {!isPublicRoute && (
-        <main className="container-fluid px-2 py-4">
+        <main className="container-fluid px-3 py-4">
           <Outlet />
         </main>
       )}
