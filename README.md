@@ -81,3 +81,34 @@ npm install
 # 6. Ejecutar la aplicación en modo desarrollo
 npm run dev
 ```
+
+### 👥 Usuarios de prueba
+
+#### Pacientes:
+
+- Identificación: `1234567890`  
+  Contraseña: `paciente123`
+
+- Identificación: `123456789`  
+  Contraseña: `paciente123`
+
+#### Doctores:
+
+- Identificación: `12345678`  
+  Contraseña: `doctor123`
+
+- Identificación: `1234567`  
+  Contraseña: `doctor123`
+
+#### Administrador:
+
+- Identificación: `123456`  
+  Contraseña: `admin123`
+
+## Uso del sistema
+
+- Recuerda entrar como admin a la parte de unidades y asignar una unidad a un doctor y otra a otro doctor.
+- Luego podrás entrar como paciente para agendar citas.
+- El paciente solo puede agendar una cita a la vez, hasta que se le atienda la cita o se pase la fecha de la cita.
+- El doctor solo puede ver las citas asignadas en el dia para el, y puede hacer la consulta de la cita y mirar el historal de consultas.
+- El administrador puede gestionar los pacientes, los doctores y las unidades.
