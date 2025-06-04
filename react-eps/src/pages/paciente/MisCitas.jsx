@@ -30,33 +30,38 @@ export function MisCitas() {
   }, [user]);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Mis Citas</h1>
+    <div className="container py-4">
+      <h2 className="mb-4 fw-bold text-primary">Mis Citas</h2>
+
       {citas.length === 0 ? (
-        <p>No tienes citas registradas.</p>
+        <div className="alert alert-info" role="alert">
+          No tienes citas registradas.
+        </div>
       ) : (
-        <table className="w-full table-auto border-collapse">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border px-4 py-2">Unidad Médica</th>
-              <th className="border px-4 py-2">Doctor</th>
-              <th className="border px-4 py-2">Fecha</th>
-              <th className="border px-4 py-2">Hora</th>
-              <th className="border px-4 py-2">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {citas.map((cita) => (
-              <tr key={cita.id}>
-                <td className="border px-4 py-2">{cita.unidad}</td>
-                <td className="border px-4 py-2">{cita.doctor}</td>
-                <td className="border px-4 py-2">{cita.fecha}</td>
-                <td className="border px-4 py-2">{cita.hora}</td>
-                <td className="border px-4 py-2">{cita.estado}</td>
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered table-hover align-middle">
+            <thead className="table-light">
+              <tr>
+                <th>Unidad Médica</th>
+                <th>Doctor</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {citas.map((cita) => (
+                <tr key={cita.id}>
+                  <td>{cita.unidad}</td>
+                  <td>{cita.doctor}</td>
+                  <td>{cita.fecha}</td>
+                  <td>{cita.hora}</td>
+                  <td>{cita.estado}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
