@@ -36,6 +36,18 @@ export function PacienteForm() {
     }
   };
 
+  const nombreValidation = {
+    pattern: {
+      value: nombreRegex,
+      message: "Solo letras permitidas",
+    },
+  };
+
+  const renderError = (field) =>
+    errors[field] && (
+      <div className="text-danger small">{errors[field].message}</div>
+    );
+
   return (
     <div className="container my-5">
       <div
@@ -65,11 +77,7 @@ export function PacienteForm() {
                   required: "Identificación es requerida",
                 })}
               />
-              {errors.identificacion && (
-                <div className="text-danger small">
-                  {errors.identificacion.message}
-                </div>
-              )}
+              {renderError("identificacion")}
             </div>
 
             {/* Nombres */}
@@ -88,17 +96,10 @@ export function PacienteForm() {
                   type="text"
                   {...register("primer_nombre", {
                     required: "Primer nombre es requerido",
-                    pattern: {
-                      value: nombreRegex,
-                      message: "Solo letras permitidas",
-                    },
+                    ...nombreValidation,
                   })}
                 />
-                {errors.primer_nombre && (
-                  <div className="text-danger small">
-                    {errors.primer_nombre.message}
-                  </div>
-                )}
+                {renderError("primer_nombre")}
               </div>
               <div className="col mb-3">
                 <label
@@ -113,17 +114,10 @@ export function PacienteForm() {
                   className="form-control"
                   type="text"
                   {...register("segundo_nombre", {
-                    pattern: {
-                      value: nombreRegex,
-                      message: "Solo letras permitidas",
-                    },
+                    ...nombreValidation,
                   })}
                 />
-                {errors.segundo_nombre && (
-                  <div className="text-danger small">
-                    {errors.segundo_nombre.message}
-                  </div>
-                )}
+                {renderError("segundo_nombre")}
               </div>
             </div>
 
@@ -143,17 +137,10 @@ export function PacienteForm() {
                   type="text"
                   {...register("primer_apellido", {
                     required: "Primer apellido es requerido",
-                    pattern: {
-                      value: nombreRegex,
-                      message: "Solo letras permitidas",
-                    },
+                    ...nombreValidation,
                   })}
                 />
-                {errors.primer_apellido && (
-                  <div className="text-danger small">
-                    {errors.primer_apellido.message}
-                  </div>
-                )}
+                {renderError("primer_apellido")}
               </div>
               <div className="col mb-3">
                 <label
@@ -168,17 +155,10 @@ export function PacienteForm() {
                   className="form-control"
                   type="text"
                   {...register("segundo_apellido", {
-                    pattern: {
-                      value: nombreRegex,
-                      message: "Solo letras permitidas",
-                    },
+                    ...nombreValidation,
                   })}
                 />
-                {errors.segundo_apellido && (
-                  <div className="text-danger small">
-                    {errors.segundo_apellido.message}
-                  </div>
-                )}
+                {renderError("segundo_apellido")}
               </div>
             </div>
 
@@ -200,11 +180,7 @@ export function PacienteForm() {
                     required: "Fecha de nacimiento es requerida",
                   })}
                 />
-                {errors.fecha_nacimiento && (
-                  <div className="text-danger small">
-                    {errors.fecha_nacimiento.message}
-                  </div>
-                )}
+                {renderError("fecha_nacimiento")}
               </div>
               <div className="col mb-3">
                 <label
@@ -227,11 +203,7 @@ export function PacienteForm() {
                   <option value="3">Especial</option>
                   <option value="4">Vinculado</option>
                 </select>
-                {errors.afiliacion && (
-                  <div className="text-danger small">
-                    {errors.afiliacion.message}
-                  </div>
-                )}
+                {renderError("afiliacion")}
               </div>
             </div>
 
@@ -254,11 +226,7 @@ export function PacienteForm() {
                   <option value="M">Masculino</option>
                   <option value="F">Femenino</option>
                 </select>
-                {errors.genero && (
-                  <div className="text-danger small">
-                    {errors.genero.message}
-                  </div>
-                )}
+                {renderError("genero")}
               </div>
               <div className="col mb-3">
                 <label
@@ -280,11 +248,7 @@ export function PacienteForm() {
                     },
                   })}
                 />
-                {errors.telefono && (
-                  <div className="text-danger small">
-                    {errors.telefono.message}
-                  </div>
-                )}
+                {renderError("telefono")}
               </div>
             </div>
 
@@ -306,11 +270,7 @@ export function PacienteForm() {
                   minLength: { value: 5, message: "Muy corta" },
                 })}
               />
-              {errors.direccion && (
-                <div className="text-danger small">
-                  {errors.direccion.message}
-                </div>
-              )}
+              {renderError("direccion")}
             </div>
 
             {/* Email */}
@@ -326,11 +286,15 @@ export function PacienteForm() {
                 id="email"
                 className="form-control"
                 type="email"
-                {...register("email", { required: "Email es requerido" })}
+                {...register("email", {
+                  required: "Email es requerido",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Formato de email inválido",
+                  },
+                })}
               />
-              {errors.email && (
-                <div className="text-danger small">{errors.email.message}</div>
-              )}
+              {renderError("email")}
             </div>
 
             {/* Contraseña y Confirmación */}
@@ -352,11 +316,7 @@ export function PacienteForm() {
                     minLength: { value: 8, message: "Mínimo 8 caracteres" },
                   })}
                 />
-                {errors.password && (
-                  <div className="text-danger small">
-                    {errors.password.message}
-                  </div>
-                )}
+                {renderError("password")}
               </div>
               <div className="col mb-3">
                 <label
@@ -377,11 +337,7 @@ export function PacienteForm() {
                       "Las contraseñas no coinciden",
                   })}
                 />
-                {errors.password_confirmation && (
-                  <div className="text-danger small">
-                    {errors.password_confirmation.message}
-                  </div>
-                )}
+                {renderError("password_confirmation")}
               </div>
             </div>
 
@@ -405,11 +361,7 @@ export function PacienteForm() {
                     "La fecha no puede ser futura",
                 })}
               />
-              {errors.fecha_ingreso && (
-                <div className="text-danger small">
-                  {errors.fecha_ingreso.message}
-                </div>
-              )}
+              {renderError("fecha_ingreso")}
             </div>
 
             <div className="d-grid mb-3">
