@@ -6,126 +6,131 @@ import { getCitas, getConsultas } from "../../api/citas.api";
 import { getUnidades, getUnidadesConDoctor } from "../../api/unidades.api";
 
 export function AdminHome() {
-  const [totalUsuarios, setTotalUsuarios] = useState(0);
-  const [totalPacientes, setTotalPacientes] = useState(0);
-  const [totalDoctores, setTotalDoctores] = useState(0);
-  const [totalCitas, setTotalCitas] = useState(0);
-  const [citasActivas, setCitasActivas] = useState(0);
-  const [totalConsultas, setTotalConsultas] = useState(0);
-  const [totalUnidades, setTotalUnidades] = useState(0);
-  const [unidadesEnUso, setUnidadesEnUso] = useState(0);
+  const [stats, setStats] = useState({
+    totalUsuarios: 0,
+    totalPacientes: 0,
+    totalDoctores: 0,
+    totalCitas: 0,
+    citasActivas: 0,
+    totalConsultas: 0,
+    totalUnidades: 0,
+    unidadesEnUso: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const usuariosRes = await getAllUsers();
-        const pacientesRes = await getPacientes();
-        const doctoresRes = await getDoctores();
-        const citasRes = await getCitas();
-        const consultasRes = await getConsultas();
-        const unidadesRes = await getUnidades();
-        const unidadesEnUsoRes = await getUnidadesConDoctor();
+      setLoading(true);
+      setError(null);
 
-        const citas = citasRes.data;
+      try {
+        const [
+          usuariosRes,
+          pacientesRes,
+          doctoresRes,
+          citasRes,
+          consultasRes,
+          unidadesRes,
+          unidadesEnUsoRes,
+        ] = await Promise.all([
+          getAllUsers(),
+          getPacientes(),
+          getDoctores(),
+          getCitas(),
+          getConsultas(),
+          getUnidades(),
+          getUnidadesConDoctor(),
+        ]);
 
         const hoy = new Date();
+        const citas = citasRes.data;
         const activas = citas.filter((cita) => {
           const fechaCita = new Date(cita.fecha_cita);
           return cita.estado === "agendada" && fechaCita >= hoy;
         });
 
-        setTotalUsuarios(usuariosRes.data.length);
-        setTotalPacientes(pacientesRes.data.length);
-        setTotalDoctores(doctoresRes.data.length);
-        setTotalCitas(citas.length);
-        setCitasActivas(activas.length);
-        setTotalConsultas(consultasRes.data.length);
-        setTotalUnidades(unidadesRes.data.length);
-        setUnidadesEnUso(unidadesEnUsoRes.data.length);
-      } catch (error) {
-        console.error("Error cargando datos del administrador:", error);
+        setStats({
+          totalUsuarios: usuariosRes.data.length,
+          totalPacientes: pacientesRes.data.length,
+          totalDoctores: doctoresRes.data.length,
+          totalCitas: citas.length,
+          citasActivas: activas.length,
+          totalConsultas: consultasRes.data.length,
+          totalUnidades: unidadesRes.data.length,
+          unidadesEnUso: unidadesEnUsoRes.data.length,
+        });
+      } catch (err) {
+        console.error("Error cargando datos del administrador:", err);
+        setError(
+          "No se pudieron cargar los datos. Intenta recargar la página."
+        );
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
+  if (loading)
+    return (
+      <div className="container my-5 text-center">
+        <div className="spinner-border text-primary" role="status" />
+        <p className="mt-3">Cargando datos del panel administrativo...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="container my-5 text-center text-danger">
+        <p>{error}</p>
+      </div>
+    );
+
   return (
     <div className="container my-4">
-      <h2 className="mb-4 text-center">Panel de Administrador</h2>
+      <h2 className="mb-4 text-center fw-bold">Panel de Administrador</h2>
 
-      {/* Sección de métricas */}
+      {/* Métricas */}
       <div className="row g-4 mb-5">
-        {/* Usuarios Totales */}
-        <div className="col-12 col-md-4">
-          <div className="card shadow-sm border-info">
-            <div className="card-body text-center">
-              <h5 className="card-title text-info">Usuarios Totales</h5>
-              <h2 className="display-6 fw-bold">{totalUsuarios}</h2>
-            </div>
-          </div>
-        </div>
-
-        {/* Pacientes */}
-        <div className="col-12 col-md-4">
-          <div className="card shadow-sm border-success">
-            <div className="card-body text-center">
-              <h5 className="card-title text-success">Pacientes</h5>
-              <h2 className="display-6 fw-bold">{totalPacientes}</h2>
-            </div>
-          </div>
-        </div>
-
-        {/* Doctores */}
-        <div className="col-12 col-md-4">
-          <div className="card shadow-sm border-primary">
-            <div className="card-body text-center">
-              <h5 className="card-title text-primary">Doctores</h5>
-              <h2 className="display-6 fw-bold">{totalDoctores}</h2>
-            </div>
-          </div>
-        </div>
-
-        {/* Citas Totales */}
-        <div className="col-12 col-md-4">
-          <div className="card shadow-sm border-dark">
-            <div className="card-body text-center">
-              <h5 className="card-title text-dark">Citas Totales</h5>
-              <h2 className="display-6 fw-bold">{totalCitas}</h2>
-            </div>
-          </div>
-        </div>
-
-        {/* Citas en Curso */}
-        <div className="col-12 col-md-4">
-          <div className="card shadow-sm border-warning">
-            <div className="card-body text-center">
-              <h5 className="card-title text-warning">Citas en Curso</h5>
-              <h2 className="display-6 fw-bold">{citasActivas}</h2>
-            </div>
-          </div>
-        </div>
-
-        {/* Consultas Totales */}
-        <div className="col-12 col-md-4">
-          <div className="card shadow-sm border-secondary">
-            <div className="card-body text-center">
-              <h5 className="card-title text-secondary">Consultas Totales</h5>
-              <h2 className="display-6 fw-bold">{totalConsultas}</h2>
-            </div>
-          </div>
-        </div>
-
-        {/* Unidades en Uso */}
-        <div className="row justify-content-center mt-4">
-          <div className="col-12 col-md-6">
-            <div className="card shadow-sm border-info text-center">
-              <div className="card-body">
-                <h5 className="card-title text-info">Unidades en Uso</h5>
-                <h2 className="display-6 fw-bold">
-                  {unidadesEnUso} / {totalUnidades}
-                </h2>
+        {[
+          {
+            label: "Usuarios Totales",
+            value: stats.totalUsuarios,
+            color: "info",
+          },
+          { label: "Pacientes", value: stats.totalPacientes, color: "success" },
+          { label: "Doctores", value: stats.totalDoctores, color: "primary" },
+          { label: "Citas Totales", value: stats.totalCitas, color: "dark" },
+          {
+            label: "Citas en Curso",
+            value: stats.citasActivas,
+            color: "warning",
+          },
+          {
+            label: "Consultas Totales",
+            value: stats.totalConsultas,
+            color: "secondary",
+          },
+        ].map(({ label, value, color }) => (
+          <div className="col-12 col-md-4" key={label}>
+            <div className={`card shadow-sm border-${color} h-100`}>
+              <div className={`card-body text-center text-${color}`}>
+                <h5 className="card-title">{label}</h5>
+                <h2 className="display-5 fw-bold">{value}</h2>
               </div>
+            </div>
+          </div>
+        ))}
+
+        <div className="col-12 col-md-6 mx-auto">
+          <div className="card shadow-sm border-info h-100 text-center">
+            <div className="card-body">
+              <h5 className="card-title text-info">Unidades en Uso</h5>
+              <h2 className="display-5 fw-bold">
+                {stats.unidadesEnUso} / {stats.totalUnidades}
+              </h2>
             </div>
           </div>
         </div>
@@ -133,45 +138,35 @@ export function AdminHome() {
 
       {/* Accesos directos */}
       <div className="row g-4">
-        <div className="col-12 col-md-4">
-          <div className="card h-100 text-center">
-            <div className="card-body d-flex flex-column justify-content-center">
-              <h5 className="card-title">Pacientes</h5>
-              <p className="card-text">
-                Registrar, editar y eliminar pacientes afiliados.
-              </p>
-              <Link to="/admin/pacientes" className="btn btn-primary mt-auto">
-                Gestionar Pacientes
-              </Link>
+        {[
+          {
+            label: "Pacientes",
+            description: "Registrar, editar y eliminar pacientes afiliados.",
+            to: "/admin/pacientes",
+          },
+          {
+            label: "Doctores",
+            description: "Registrar, editar y eliminar doctores.",
+            to: "/admin/doctores",
+          },
+          {
+            label: "Unidades",
+            description: "Crear y administrar unidades médicas.",
+            to: "/admin/unidades",
+          },
+        ].map(({ label, description, to }) => (
+          <div className="col-12 col-md-4" key={label}>
+            <div className="card h-100 text-center shadow-sm">
+              <div className="card-body d-flex flex-column justify-content-center">
+                <h5 className="card-title">{label}</h5>
+                <p className="card-text">{description}</p>
+                <Link to={to} className="btn btn-primary mt-auto">
+                  Gestionar {label}
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="col-12 col-md-4">
-          <div className="card h-100 text-center">
-            <div className="card-body d-flex flex-column justify-content-center">
-              <h5 className="card-title">Doctores</h5>
-              <p className="card-text">
-                Registrar, editar y eliminar doctores.
-              </p>
-              <Link to="/admin/doctores" className="btn btn-primary mt-auto">
-                Gestionar Doctores
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-12 col-md-4">
-          <div className="card h-100 text-center">
-            <div className="card-body d-flex flex-column justify-content-center">
-              <h5 className="card-title">Unidades</h5>
-              <p className="card-text">Crear y administrar unidades médicas.</p>
-              <Link to="/admin/unidades" className="btn btn-primary mt-auto">
-                Gestionar Unidades
-              </Link>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

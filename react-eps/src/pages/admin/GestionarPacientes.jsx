@@ -308,7 +308,6 @@ export function GestionarPacientes() {
                         { value: "", text: "Seleccione" },
                         { value: "M", text: "Masculino" },
                         { value: "F", text: "Femenino" },
-                        { value: "O", text: "Otro" },
                       ],
                     },
                     {
