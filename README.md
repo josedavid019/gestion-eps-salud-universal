@@ -24,6 +24,8 @@ Este proyecto utiliza Django como backend, conectado a una base de datos SQLite.
 
 ### 🖥️ Pasos para ejecutar el backend
 
+#### Abrir una terminal de Git Bash
+
 ```bash
 # 1. Ir al escritorio y crear la carpeta del proyecto
 cd ~/Desktop
@@ -53,7 +55,11 @@ python manage.py runserver
 
 ## 🚀 Instalación del Frontend (React)
 
+Este proyecto utiliza React como frontend.
+
 ### 🖥️ Pasos para ejecutar el frontend
+
+#### Abrir una terminal de Git Bash
 
 ```bash
 # 1. Abrir Git Bash y navegar a la carpeta del proyecto
