@@ -69,12 +69,15 @@ cd gestion-eps-salud-universal/
 # 2. (Opcional) Abrir el proyecto en VS Code
 code .
 
-# 3. Entrar al directorio del frontend
+# 3. Activar el entorno virtual
+source venv/Scripts/activate
+
+# 4. Entrar al directorio del frontend
 cd react-eps/
 
-# 4. Instalar las dependencias de Node.js
+# 5. Instalar las dependencias de Node.js
 npm install
 
-# 5. Ejecutar la aplicación en modo desarrollo
+# 6. Ejecutar la aplicación en modo desarrollo
 npm run dev
 ```
