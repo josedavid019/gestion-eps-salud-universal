@@ -70,11 +70,7 @@ export function DoctorHome() {
 
     try {
       const res = await getConsultaPorCita(cita.cita_id);
-      if (res.data.length > 0) {
-        setConsultaExistente(res.data[0]);
-      } else {
-        setConsultaExistente(null);
-      }
+      setConsultaExistente(res.data.length > 0 ? res.data[0] : null);
     } catch (error) {
       console.error("Error buscando consulta:", error);
     }
@@ -86,21 +82,27 @@ export function DoctorHome() {
   };
 
   return (
-    <div className="container my-4">
-      <h2 className="mb-4">Agenda del Día</h2>
-      <div className="mb-3">
-        <span className="badge bg-primary me-2">
-          Agendadas: {agendadaCount}
-        </span>
-        <span className="badge bg-success me-2">
-          Atendidas: {atendidaCount}
-        </span>
-        <span className="badge bg-danger">No Atendidas: {noAtendidaCount}</span>
+    <div className="container my-5">
+      <h2 className="text-primary mb-4 text-center">Agenda del Día</h2>
+
+      <div className="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge bg-primary">Agendadas</span>
+          <span className="fw-semibold text-primary">{agendadaCount}</span>
+        </div>
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge bg-success">Atendidas</span>
+          <span className="fw-semibold text-success">{atendidaCount}</span>
+        </div>
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge bg-danger">No Atendidas</span>
+          <span className="fw-semibold text-danger">{noAtendidaCount}</span>
+        </div>
       </div>
 
       <div className="table-responsive">
-        <table className="table table-hover">
-          <thead>
+        <table className="table table-bordered align-middle table-hover shadow-sm">
+          <thead className="table-light">
             <tr>
               <th>Fecha</th>
               <th>Hora</th>
@@ -111,8 +113,8 @@ export function DoctorHome() {
             </tr>
           </thead>
           <tbody>
-            <>
-              {appointments.map((a) => (
+            {appointments.length > 0 ? (
+              appointments.map((a) => (
                 <tr
                   key={a.cita_id}
                   className={
@@ -129,26 +131,38 @@ export function DoctorHome() {
                     {a.usuario.primer_nombre} {a.usuario.primer_apellido}
                   </td>
                   <td>{a.usuario.identificacion}</td>
-                  <td>{getEstadoLabel(a.estado)}</td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        a.estado === "agendada"
+                          ? "bg-primary"
+                          : a.estado === "atendida"
+                          ? "bg-success"
+                          : "bg-danger"
+                      }`}
+                    >
+                      {getEstadoLabel(a.estado)}
+                    </span>
+                  </td>
                   <td>
                     <button
-                      className="btn btn-sm btn-outline-primary"
+                      className="btn btn-outline-primary btn-sm"
                       onClick={() => handleVerClick(a)}
                     >
                       Ver
                     </button>
                   </td>
                 </tr>
-              ))}
-
-              {appointments.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="text-center text-muted">
-                    No hay citas programadas para hoy.
-                  </td>
-                </tr>
-              )}
-            </>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center text-muted py-4">
+                  <i className="bi bi-calendar-x fs-3"></i>
+                  <br />
+                  No hay citas programadas para hoy.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
